@@ -1,0 +1,76 @@
+@font-face {
+     font-family: 'Comfortaa';
+     src: url('/Comfortaa.ttf') format('truetype');
+     font-weight: normal;
+     font-style: normal;
+}
+
+body {
+     margin: 0;
+     padding: 0;
+     height: 100vh;
+     overflow: hidden;
+     background: linear-gradient(135deg, #1a6fc9 0%, #0d47a1 50%, #002171 100%);
+     animation: wave 15s ease-in-out infinite;
+     position: relative;
+     font-family: 'Comfortaa';
+     /* Apply Comfortaa font */
+}
+
+/* Oceano */
+body::after {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+     background:
+          radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+          radial-gradient(circle at 90% 30%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+          radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+     background-size: 100px 100px;
+     animation: texture 30s linear infinite;
+     pointer-events: none;
+}
+
+@keyframes texture {
+     0% {
+          background-position: 0 0, 50px 100px, 100px 50px;
+     }
+
+     100% {
+          background-position: 200px 0, 250px 100px, 300px 50px;
+     }
+}
+
+label {
+     display: block;
+     margin-bottom: 0.5rem;
+     font-weight: bold;
+}
+
+input {
+     padding: 0.5rem;
+     border: 1px solid #d1d5db;
+     border-radius: 6px;
+     background: rgb(255, 255, 255);
+     color: black;
+     font-size: 1rem;
+     font-weight: 700;
+     width: 100%;
+}
+
+input:focus {
+     outline: none;
+     border-color: #60a5fa;
+     box-shadow: 0 0 4px #60a5fa;
+}
+
+h1,
+h2 {
+     color: #60a5fa;
+     margin-bottom: 1rem;
+     text-align: center;
+     font-size: x-large;
+}
