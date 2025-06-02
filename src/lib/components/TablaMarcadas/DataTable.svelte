@@ -2,6 +2,7 @@
 	import { List } from 'svelte-virtual';
 	import EditableCell from './EditableCell.svelte';
 	import { isAdmin } from '$lib/stores/usuario';
+	import type { shortUsuario } from '$lib/types/gen';
 
 	type columnsType = {
 		id: string;
@@ -10,11 +11,12 @@
 		type?: 'text' | 'checkbox'; // Optional type for cell content
 	};
 
-	let { columns, data, editable, onCellEdit }: {
+	let { columns, data, editable, onCellEdit, usuario }: {
 		columns: Array<columnsType>;
 		data: Array<Record<string, any>>;
 		editable: boolean;
 		onCellEdit?: (rowIndex: number, colId: string, newValue: string) => void;
+		usuario: shortUsuario;
 	} = $props();
 
 	let filter = $state('');
@@ -76,7 +78,7 @@
 <div class="table-controls">
 	<input type="text" placeholder="Filtrar..." bind:value={filter} class="filter-input" />
 	<button type="button" onclick={clearFiltersAndSorts} class="clear-btn">X</button>
-	{#if isAdmin()}
+	{#if usuario.role === 'ADMIN'}
 		<button onclick={() => (editable = !editable)} style="font-size: 1.2em; margin-left: 10px;">
 		{editable ? '✅ Guardar' : '✏️ Editar'}
 	</button>

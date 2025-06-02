@@ -42,7 +42,7 @@
 </div>
 
 <div class="tabla-container">
-	<Tabla {selectedDepartamento} departamentos={departamentosPermitidos} />
+	<Tabla {selectedDepartamento} departamentos={departamentosPermitidos} usuario={resto.data.usuario} />
 </div>
 
 <style>

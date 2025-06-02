@@ -20,10 +20,11 @@
 	import Opciones from './Opciones.svelte';
 
 	/** Tipos */
-	import type { Departamento, Marcada } from '$lib/types/gen';
+	import type { Departamento, Marcada, shortUsuario } from '$lib/types/gen';
 	import { isAdmin } from '$lib/stores/usuario';
 
-	let { selectedDepartamento = $bindable(), departamentos = [] }: { selectedDepartamento: string, departamentos: Departamento[] } = $props();
+	let { selectedDepartamento = $bindable(), departamentos = [], usuario }:
+	 { selectedDepartamento: string, departamentos: Departamento[], usuario: shortUsuario } = $props();
 
 	/** Variables */
 	let selectedOpcion = $state('estandar');
@@ -188,6 +189,7 @@
 						data={ocultarInactivos ? filtrarPersonalActivo(marcadas) : marcadas}
 						{columns}
 						onCellEdit={handleCellEdit}
+						usuario={usuario}
 					/>
 				</div>
 			{:else}
