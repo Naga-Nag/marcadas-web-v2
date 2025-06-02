@@ -148,7 +148,7 @@ main {
 }
 h1 {
     text-align: center;
-    color: #1976d2;
+    color: #ffffff;
     margin-bottom: 1em;
 }
 .btn {

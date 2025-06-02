@@ -6,9 +6,9 @@
 	import { fetchMarcadas } from '$lib/apiController/marcadasApi';
 	import { fetchDepartamentos } from '$lib/apiController/departamentosApi';
 	import { generateExcelFromTemplate } from '$lib/utils/genParteClientSide';
-	import { filtrarPersonalActivo } from '$lib/utils';
+	import { filtrarAusentes, filtrarPersonalActivo } from '$lib/utils';
 	import { updatePersonal } from '$lib/apiController/personal';
-
+	import { downloadExcel } from '$lib/utils/genExcel';
 	/** Stores*/
 	import { globalStore, isLoading } from '$lib/stores/global';
 
@@ -159,6 +159,21 @@
 						/></svg
 					>
 					Generar Parte Diario
+				</button>
+			{/if}
+			{#if selectedDepartamento === 'ARPB'}
+				<button class="excel-btn animate-pop"
+					onclick={() => {
+						const ausentes = filtrarAusentes(marcadas);
+						const ausentesActivos = filtrarPersonalActivo(ausentes);
+						if (!ausentes || ausentes.length === 0) {
+							alert('No hay ausentes para exportar a Excel.');
+						} else {
+							downloadExcel(ausentesActivos, 'ausentes');
+						}
+					}}
+				>
+					Descargar Ausentes
 				</button>
 			{/if}
 		</div>

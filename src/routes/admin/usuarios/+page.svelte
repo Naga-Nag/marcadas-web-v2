@@ -229,7 +229,7 @@ main {
 
 h1, h2 {
     text-align: center;
-    color: #1976d2;
+    color: #ffffff;
     margin-bottom: 0.7em;
 }
 

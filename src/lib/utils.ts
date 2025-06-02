@@ -107,6 +107,12 @@ export function filtrarPersonalActivo(marcadas: Marcada[]): Marcada[] {
      return marcadas.filter((marcada) => marcada.Personal.Activo);
 }
 
+export function filtrarAusentes(marcadas: Marcada[]): Marcada[] {
+     return marcadas.filter((marcada) => {
+          return !marcada.Entrada && !marcada.Salida;
+     });
+}
+
 export function reemplazarMarcadas(registros: Marcada[], newItem: Marcada) {
      return registros.map((item) =>
           item.Personal.UID === newItem.Personal.UID ? { ...item, ...newItem } : item
