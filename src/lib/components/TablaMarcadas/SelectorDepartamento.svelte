@@ -7,7 +7,7 @@
 		onSelect = () => {}
 	}: {
 		departamentos: Departamento[];
-		selected: string | null;
+		selected: Departamento | null;
 		onSelect: (depa: string) => void;
 	} = $props();
 
@@ -24,9 +24,9 @@
 	{#if departamentos.length === 0}
 		<p>No hay departamentos disponibles</p>
 
-    {:else}
+	{:else}
 		{#each departamentos as depa}
-			<button class:selected={selected === depa.DeptName} onclick={() => onSelect(depa.DeptName)}>
+			<button class:selected={selected === depa} onclick={() => onSelect(depa.DeptName)}>
 				{depa.DeptName}
 			</button>
 		{/each}
@@ -38,6 +38,10 @@
 		display: flex;
 		gap: 0.5em;
 		margin-bottom: 1em;
+		overflow-x: auto;
+		overflow-y: hidden;
+		white-space: nowrap;
+		max-width: 100%;
 	}
 	button {
 		padding: 0.7em 1.2em;

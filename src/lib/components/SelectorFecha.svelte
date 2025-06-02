@@ -7,7 +7,7 @@
 	let { fecha = $bindable() }: { fecha: string } = $props();
 
 	/** Variables */
-	let hoy = new Date().toISOString().split('T')[0];
+	let hoy = fecha || new Date().toISOString().split('T')[0];
 	let isLoading = $state(false);
 
 	globalStore.subscribe((state) => {

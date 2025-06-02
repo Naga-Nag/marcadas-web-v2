@@ -2,11 +2,13 @@
 	import Tabla from '$lib/components/TablaMarcadas/Tabla.svelte';
 	import { logout } from '$lib/apiController/usuarioApi';
 	import { fetchDepartamentos } from '$lib/apiController/departamentosApi';
+	import { fetchDepartamentoByName } from '$lib/apiController/departamentosApi';
 	import { onMount } from 'svelte';
 	import type { Departamento } from '$lib/types/gen';
+	import { browser } from '$app/environment';
 	let { ...resto } = $props();
 
-	let selectedDepartamento = $state(resto.data.usuario?.departamento);
+	let selectedDepartamento = $state<Departamento | null>(null);
 	console.log(resto.data.usuario);
 	let departamentosPermitidos: Departamento[] = $state(
 		Array.isArray(resto.data.usuario.departamentosPermitidos)
@@ -19,6 +21,16 @@
 	onMount(async () => {
 		if (resto.data.usuario?.role === 'ADMIN') {
 			departamentosPermitidos = await fetchDepartamentos();
+		}
+		else {
+			selectedDepartamento = await fetchDepartamentoByName(resto.data.usuario?.departamento)
+			console.log('selectedDepartamento', selectedDepartamento);
+		}
+		if (browser) {
+			const body = document.querySelector('body');
+			if (body) {
+				body.style.overflow = 'auto';
+			}
 		}
 	});
 </script>
@@ -49,11 +61,11 @@
 	.header {
 		display: inline-flex;
 		flex-direction: row;
-		padding: 1em;
+
 		gap: 1em;
 	}
 	.tabla-container {
-		margin-bottom: 2em;
+		box-sizing: border-box;
 	}
 
 	.estrella {

@@ -4,6 +4,7 @@ import { fetchDepartamentos } from '$lib/apiController/departamentosApi'; // <--
 import { filtrarPersonalActivo } from '$lib/utils';
 import ExcelJS from 'exceljs';
 
+
 export async function generateExcelFromTemplate(departamento: string, fecha: string): Promise<void> {
      console.time('generateExcelFromTemplate');
      let marcadas: Marcada[] = await fetchMarcadas(departamento, fecha, 'estandar');

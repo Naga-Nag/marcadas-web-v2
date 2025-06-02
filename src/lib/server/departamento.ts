@@ -36,6 +36,33 @@ export async function getDepartamentos(): Promise<Array<Departamento>> {
   });
 }
 
+export async function getDepartamentoByName(deptName: string): Promise<Departamento | null> {
+  return new Promise((resolve, reject) => {
+    const request = connection.request();
+    request.arrayRowMode = true;
+    // Set up the query for detailed data
+    const query = `USE ${Bun.env.DB}; SELECT Deptid, DeptName, selloJefe, leyendaJefe FROM Dept WHERE DeptName = @deptName;`;
+    request.input('deptName', sql.NVarChar, deptName);
+
+    request.query(query);
+
+    request.on('row', (row) => {
+      const departamento: Departamento = {
+        Deptid: row[0],
+        DeptName: row[1],
+        SelloJefe: row[2] ? row[2].toString('base64') : null,
+        leyendaJefe: row[3]
+      };
+      resolve(departamento);
+    });
+
+    request.on('error', (err) => {
+      console.error('Error fetching data:', err);
+      reject(err);
+    });
+  });
+}
+
 export async function DepartamentofromDeptID(deptid: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const request = connection.request();

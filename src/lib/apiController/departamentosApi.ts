@@ -16,6 +16,19 @@ export async function fetchDepartamentos(): Promise<Departamento[]> {
     return data as Departamento[];
 }
 
+export async function fetchDepartamentoByName(deptName: string): Promise<Departamento | null> {
+    const res = await fetch(`${API_DEPARTAMENTOS}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (!res.ok) {
+        notify({ title: 'Error', message: data.error || 'Error fetching departamento', type: 'error', duration: 3000 });
+        throw new Error(data.error || 'Error fetching departamento');
+    }
+    return data as Departamento;
+}
+
 export async function updateDepartamento(departamento: Departamento): Promise<void> {
     const res = await fetch(`${API_DEPARTAMENTOS}`, {
         method: 'PUT',

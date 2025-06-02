@@ -21,19 +21,18 @@
 
 	/** Tipos */
 	import type { Departamento, Marcada, shortUsuario } from '$lib/types/gen';
-	import { isAdmin } from '$lib/stores/usuario';
 
-	let { selectedDepartamento = $bindable(), departamentos = [], usuario }:
-	 { selectedDepartamento: string, departamentos: Departamento[], usuario: shortUsuario } = $props();
+	let { selectedDepartamento, departamentos = [], usuario }:
+	 { selectedDepartamento: Departamento | null, departamentos: Departamento[], usuario: shortUsuario } = $props();
 
 	/** Variables */
 	let selectedOpcion = $state('estandar');
-	let fecha = $state('');
+	let fecha = $state(new Date().toISOString().split('T')[0]);
 	let marcadas: Marcada[] = $state([]);
 	let loading = $state(true);
 	let ocultarInactivos = $state(true);
 	let editable = $state(false); // o true si quieres que sea editable por defecto
-
+	console.log('selectedDepartamento', selectedDepartamento);
 	globalStore.subscribe((state) => {
 		marcadas = state.marcadas;
 		loading = state.loading;
@@ -55,7 +54,7 @@
 				{ id: 'Personal.MR', width: 80, header: 'MR', footer: 'MR', type: 'text' },
 				{ id: 'Personal.CUIL', width: 100, header: 'CUIL', footer: 'CUIL', type: 'text' },
 				{ id: 'Personal.Nombre', width: 180, header: 'Nombre', footer: 'Nombre', type: 'text' },
-				{ id: 'Personal.Departamento', width: 140, header: 'Departamento', footer: 'Departamento', type: 'text' },
+				{ id: 'Personal.Departamento', width: 80, header: 'Departamento', footer: 'Departamento', type: 'text' },
 				{ id: 'Salida', width: 120, header: 'Salida', footer: 'Salida', type: 'text' },
 				{ id: 'Entrada', width: 120, header: 'Entrada', footer: 'Entrada', type: 'text' },
 				{ id: 'Estado', width: 120, header: 'Estado', footer: 'Estado', type: 'text' },
@@ -75,7 +74,12 @@
 
 	async function syncMarcadas() {
 		try {
-			marcadas = await fetchMarcadas(selectedDepartamento, fecha, selectedOpcion);
+			if (!selectedDepartamento || !fecha) {
+				console.warn('Departamento o fecha no seleccionados');
+				return;
+			}
+			console.log('Sincronizando marcadas para:', selectedDepartamento!.DeptName, 'en fecha:', fecha, 'con opción:', selectedOpcion);
+			marcadas = await fetchMarcadas(selectedDepartamento!.DeptName, fecha, selectedOpcion);
 		} catch (error) {
 			console.error('Error al sincronizar marcadas:', error);
 		}
@@ -139,7 +143,9 @@
 		{departamentos}
 		selected={selectedDepartamento}
 		onSelect={(depa) => {
-			selectedDepartamento = depa;
+			selectedDepartamento = typeof depa === 'string'
+				? departamentos.find(d => d.DeptName === depa) ?? selectedDepartamento
+				: depa;
 			syncMarcadas();
 		}}
 	/>
@@ -151,7 +157,7 @@
 			{#if fecha}
 				<button
 					class="excel-btn animate-pop"
-					onclick={() => generateExcelFromTemplate(selectedDepartamento!, fecha)}
+					onclick={() => generateExcelFromTemplate(selectedDepartamento!.DeptName, fecha)}
 				>
 					<svg width="20" height="20" fill="none" viewBox="0 0 24 24"
 						><path
@@ -162,7 +168,7 @@
 					Generar Parte Diario
 				</button>
 			{/if}
-			{#if selectedDepartamento === 'ARPB'}
+			{#if selectedDepartamento.DeptName === 'ARPB'}
 				<button class="excel-btn animate-pop"
 					onclick={() => {
 						const ausentes = filtrarAusentes(marcadas);
@@ -194,7 +200,7 @@
 				</div>
 			{:else}
 				<p class="no-marcadas animate-pop">
-					No hay marcadas para el departamento <b>{selectedDepartamento}</b> en la fecha
+					No hay marcadas para el departamento <b>{selectedDepartamento.DeptName}</b> en la fecha
 					<b>{fecha}</b>.
 				</p>
 			{/if}

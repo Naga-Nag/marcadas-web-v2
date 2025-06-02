@@ -28,5 +28,13 @@ export default defineConfig({
 				}
 			}
 		]
+	},
+	server: {
+		origin: 'http://marcadas.arpb.mil',
+		fs: {
+			allow: [
+				'/parte-template.xlsx'
+			]
+		}
 	}
 });
