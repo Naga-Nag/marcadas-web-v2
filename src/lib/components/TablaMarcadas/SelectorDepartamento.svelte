@@ -1,18 +1,21 @@
 <script lang="ts">
+	import type { Departamento } from "$lib/types/gen";
+
 	let {
 		departamentos = [],
 		selected = null,
 		onSelect = () => {}
 	}: {
-		departamentos: string[];
+		departamentos: Departamento[];
 		selected: string | null;
 		onSelect: (depa: string) => void;
 	} = $props();
 
 	if (departamentos && departamentos.length > 0) {
-		const idx = departamentos.indexOf('ARPB');
+		const idx = departamentos.findIndex(d => d.DeptName === 'ARPB');
 		if (idx > 0) {
-			departamentos = ['ARPB', ...departamentos.slice(0, idx), ...departamentos.slice(idx + 1)];
+			const arpb = departamentos[idx];
+			departamentos = [arpb, ...departamentos.slice(0, idx), ...departamentos.slice(idx + 1)];
 		}
 	}
 </script>
@@ -23,8 +26,8 @@
 
     {:else}
 		{#each departamentos as depa}
-			<button class:selected={selected === depa} onclick={() => onSelect(depa)}>
-				{depa}
+			<button class:selected={selected === depa.DeptName} onclick={() => onSelect(depa.DeptName)}>
+				{depa.DeptName}
 			</button>
 		{/each}
 	{/if}

@@ -35,6 +35,14 @@ export type shortUsuario = {
     departamentosPermitidos: string[] | null;
 }
 
+export type Departamento = {
+    Deptid: number;
+    DeptName: string;
+    SelloJefe: string | null; // o Buffer | null si lo manejas como imagen
+    leyendaJefe: string | null;
+};
+
+
 export type Notification = {
     id?: number;
     title: string;

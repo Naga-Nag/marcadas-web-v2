@@ -1,21 +1,27 @@
-import { get } from 'http';
-import {connection, processRow} from './db';
+import { connection } from './db';
+import type { Departamento } from '$lib/types/gen';
 import sql from "mssql";
 
-export async function getDepartamentos(): Promise<Array<Record<string, any>>> {
+export async function getDepartamentos(): Promise<Array<Departamento>> {
   await connection?.connect();
 
   return new Promise(async (resolve, reject) => {
-    const rows: Array<Record<string, any>> = [];
+    const rows: Array<Departamento> = [];
     const request = connection.request();
     request.arrayRowMode = true;
 
     // Define and execute the query
-    const query = `USE ${Bun.env.DB}; SELECT DeptName FROM Dept;`;
+    const query = `USE ${Bun.env.DB}; SELECT Deptid, DeptName, selloJefe, leyendaJefe FROM Dept;`;
     request.query(query);
 
     request.on('row', (row) => {
-      rows.push(row[0]);
+      const departamento: Departamento = {
+        Deptid: row[0],
+        DeptName: row[1],
+        SelloJefe: row[2] ? row[2].toString('base64') : null,
+        leyendaJefe: row[3]
+      };
+      rows.push(departamento);
     });
 
     request.on('error', (err) => {
@@ -24,6 +30,7 @@ export async function getDepartamentos(): Promise<Array<Record<string, any>>> {
     });
 
     request.on('done', () => {
+      console.log("INFO db :: " + rows.length + " departamentos encontrados");
       resolve(rows);
     });
   });
@@ -82,7 +89,7 @@ export async function setSelloJefe(dept: string | number, sello: Buffer): Promis
     request.arrayRowMode = true;
 
     // Set up the query for updating the sello (IMAGE field)
-    const query = `USE ${Bun.env.DB}; UPDATE Dept SET SelloJefe = @sello WHERE Deptid = @dept;`;
+    const query = `USE ${Bun.env.DB}; UPDATE Dept SET selloJefe = @sello WHERE Deptid = @dept;`;
     request.input('sello', sql.Image, sello);
     request.input('dept', sql.Int, dept);
 
@@ -128,15 +135,50 @@ export async function getSelloJefeFromDepartamento(dept: string | number): Promi
   });
 }
 
-export async function setLeyendaSello(dept: string | number, leyenda: string): Promise<void> {
-  return new Promise((resolve, reject) => {
+export async function updateDepartamento(depto: Partial<Departamento>) {
+  return new Promise<void>((resolve, reject) => {
     const request = connection.request();
     request.arrayRowMode = true;
 
-    // Set up the query for updating the leyenda
-    const query = `USE ${Bun.env.DB}; UPDATE Dept SET leyendaJefe = @leyenda WHERE Deptid = @dept;`;
-    request.input('leyenda', sql.NVarChar, leyenda);
-    request.input('dept', sql.Int, dept);
+    // Only Deptid or DeptName is required to identify the row
+    if (!depto.Deptid && !depto.DeptName) {
+      return reject(new Error('Either Deptid or DeptName must be provided to identify the departamento.'));
+    }
+
+    // Build SET clause dynamically
+    const setClauses: string[] = [];
+    if (depto.DeptName !== undefined) {
+      setClauses.push('DeptName = @deptName');
+      request.input('deptName', sql.NVarChar, depto.DeptName);
+    }
+    if (depto.SelloJefe !== undefined) {
+      let bufferValue = depto.SelloJefe;
+      if (typeof bufferValue === 'string') {
+        bufferValue = Buffer.from(bufferValue, 'base64');
+      }
+      setClauses.push('selloJefe = @selloJefe');
+      request.input('selloJefe', sql.Image, bufferValue);
+    }
+    if (depto.leyendaJefe !== undefined) {
+      setClauses.push('leyendaJefe = @leyendaJefe');
+      request.input('leyendaJefe', sql.NVarChar, depto.leyendaJefe);
+    }
+
+    if (setClauses.length === 0) {
+      return reject(new Error('No fields to update.'));
+    }
+
+    // Build WHERE clause
+    let whereClause = '';
+    if (depto.Deptid !== undefined) {
+      whereClause = 'Deptid = @deptid';
+      request.input('deptid', sql.Int, depto.Deptid);
+    } else if (depto.DeptName !== undefined) {
+      whereClause = 'DeptName = @deptName';
+      // deptName input already set above
+    }
+
+    const query = `USE ${Bun.env.DB}; UPDATE Dept SET ${setClauses.join(', ')} WHERE ${whereClause};`;
 
     request.query(query);
 
@@ -145,7 +187,7 @@ export async function setLeyendaSello(dept: string | number, leyenda: string): P
     });
 
     request.on('error', (err) => {
-      console.error('Error updating leyenda:', err);
+      console.error('Error updating departamento:', err);
       reject(err);
     });
   });

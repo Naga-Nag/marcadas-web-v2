@@ -20,10 +20,10 @@
 	import Opciones from './Opciones.svelte';
 
 	/** Tipos */
-	import type { Marcada } from '$lib/types/gen';
+	import type { Departamento, Marcada } from '$lib/types/gen';
 	import { isAdmin } from '$lib/stores/usuario';
 
-	let { selectedDepartamento = $bindable(), departamentos = [] }: { selectedDepartamento: string, departamentos: string[] } = $props();
+	let { selectedDepartamento = $bindable(), departamentos = [] }: { selectedDepartamento: string, departamentos: Departamento[] } = $props();
 
 	/** Variables */
 	let selectedOpcion = $state('estandar');

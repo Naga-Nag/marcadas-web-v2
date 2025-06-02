@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { fetchUsuarios, createUsuario, updateUsuario, deleteUsuario } from '$lib/apiController/usuarioApi';
 	import { fetchDepartamentos } from '$lib/apiController/departamentosApi';
-	import type { shortUsuario } from '$lib/types/gen';
+	import type { Departamento, shortUsuario } from '$lib/types/gen';
 	import { onMount } from 'svelte';
 	import { fade, slide } from 'svelte/transition';
 	import Tag from '$lib/components/Tag.svelte';
 
 	let usuarios: shortUsuario[] = [];
-	let departamentos: string[] = [];
+	let departamentos: Departamento[] = [];
 	let showRegisterForm = false;
 	let error = '';
 	let loading = false;
@@ -169,10 +169,10 @@
 							{#each departamentos as dep}
 								<button
 									type="button"
-									class="departamento-btn {form.departamentosPermitidos && form.departamentosPermitidos.includes(dep) ? 'active' : ''}"
-									on:click={() => handleDepartamentoToggle(dep)}
+									class="departamento-btn {form.departamentosPermitidos && form.departamentosPermitidos.includes(dep.DeptName) ? 'active' : ''}"
+									on:click={() => handleDepartamentoToggle(dep.DeptName)}
 								>
-									{dep}
+									{dep.DeptName}
 								</button>
 							{/each}
 						</div>

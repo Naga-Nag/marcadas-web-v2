@@ -3,11 +3,12 @@
 	import { logout } from '$lib/apiController/usuarioApi';
 	import { fetchDepartamentos } from '$lib/apiController/departamentosApi';
 	import { onMount } from 'svelte';
+	import type { Departamento } from '$lib/types/gen';
 	let { ...resto } = $props();
 
 	let selectedDepartamento = $state(resto.data.usuario?.departamento);
 	console.log(resto.data.usuario);
-	let departamentosPermitidos: string[] = $state(
+	let departamentosPermitidos: Departamento[] = $state(
 		Array.isArray(resto.data.usuario.departamentosPermitidos)
 			? resto.data.usuario.departamentosPermitidos
 			: resto.data.usuario?.departamentosPermitidos
