@@ -94,28 +94,46 @@ export async function generateExcelFromTemplate(departamento: string, fecha: str
      // Find the row index where the table starts
      let tableStartRow = 6; // Adjust this to match the actual template row index
 
-     // Insert rows dynamically to avoid overwriting existing content
+     // Insert rows dinámicamente: una fila para Entrada, otra para Salida
      marcadas.forEach((record: any, index: number) => {
-          const rowIndex = tableStartRow + index;
+          const rowIndexEntrada = tableStartRow + index * 2;
+          const rowIndexSalida = rowIndexEntrada + 1;
 
-          worksheet.spliceRows(rowIndex, 0, []); // Insert an empty row at the correct position
+          // Fila de Entrada
+          worksheet.spliceRows(rowIndexEntrada, 0, []);
+          const rowEntrada = worksheet.getRow(rowIndexEntrada);
+          rowEntrada.getCell(1).value = record.Personal.Nombre;
+          rowEntrada.getCell(2).value = record.Personal.MR;
+          rowEntrada.getCell(3).value = record.Personal.CUIL;
+          rowEntrada.getCell(4).value = 'Entrada';
+          rowEntrada.getCell(5).value = record.Entrada;
 
-          const row = worksheet.getRow(rowIndex);
-          row.getCell(1).value = record.Personal.Nombre;
-          row.getCell(2).value = record.Personal.MR;
-          row.getCell(3).value = record.Personal.CUIL;
-          row.getCell(4).value = record.Salida;
-          row.getCell(5).value = record.Entrada;
-
-          row.eachCell((cell) => {
+          rowEntrada.eachCell((cell) => {
                cell.font = {
                     bold: record.bold || false,
                     name: 'Arial'
                };
                cell.alignment = { horizontal: 'center' };
           });
+          rowEntrada.commit();
 
-          row.commit();
+          // Fila de Salida
+          worksheet.spliceRows(rowIndexSalida, 0, []);
+          const rowSalida = worksheet.getRow(rowIndexSalida);
+          rowSalida.getCell(1).value = record.Personal.Nombre;
+          rowSalida.getCell(2).value = record.Personal.MR;
+          rowSalida.getCell(3).value = record.Personal.CUIL;
+          rowSalida.getCell(4).value = 'Salida';
+          rowSalida.getCell(5).value = record.Salida;
+
+          rowSalida.eachCell((cell) => {
+               cell.font = {
+                    bold: record.bold || false,
+                    name: 'Arial'
+               };
+               cell.alignment = { horizontal: 'center' };
+          });
+          rowSalida.commit();
      });
 
      // Generate the Excel file as a Blob
