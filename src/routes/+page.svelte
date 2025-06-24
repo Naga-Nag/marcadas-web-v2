@@ -48,7 +48,11 @@
 	{#if resto.data.usuario?.role === 'ADMIN'}
 		<hr />
 		<a href="/admin/usuarios" class="admin-link">
-			<img src="starfish.png" alt="Admin" width="30" height="30" class="estrella" />
+			<img src="personas.png" alt="Admin" width="30" height="30" class="estrella" />
+		</a>
+		<hr />
+		<a href="/admin/departamentos" class="admin-link">
+			<img src="departamentos.png" alt="Admin" width="30" height="30" class="estrella" />
 		</a>
 	{/if}
 </div>

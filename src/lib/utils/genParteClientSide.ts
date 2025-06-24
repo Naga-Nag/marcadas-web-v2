@@ -3,6 +3,7 @@ import { fetchMarcadas } from '$lib/apiController/marcadasApi';
 import { fetchDepartamentos } from '$lib/apiController/departamentosApi'; // <-- Import this
 import { filtrarPersonalActivo } from '$lib/utils';
 import ExcelJS from 'exceljs';
+import { Buffer } from 'buffer';
 
 
 export async function generateExcelFromTemplate(departamento: string, fecha: string): Promise<void> {
@@ -71,24 +72,55 @@ export async function generateExcelFromTemplate(departamento: string, fecha: str
 
      // Insert selloJefe image if available
      if (selloJefeBase64 && selloJefeCell) {
-          // Convert base64 to buffer
-          const imageBuffer = typeof Buffer !== 'undefined'
-               ? Buffer.from(selloJefeBase64, 'base64')
-               : Uint8Array.from(atob(selloJefeBase64), c => c.charCodeAt(0)); // fallback for browsers
+          // Convert base64 to Uint8Array (compatible with ExcelJS in browser)
+          const imageBuffer = Uint8Array.from(atob(selloJefeBase64), c => c.charCodeAt(0));
 
-          const imageId = workbook.addImage({
-               buffer: imageBuffer as any,
-               extension: 'png', // or 'jpeg' depending on your image type
+          const img = new window.Image();
+          img.src = 'data:image/png;base64,' + selloJefeBase64;
+
+          await new Promise<void>((resolve) => {
+               img.onload = () => {
+                    if (!selloJefeCell) {
+                         resolve();
+                         return;
+                    }
+                    const width = img.naturalWidth;
+                    const height = img.naturalHeight;
+
+                    const imageId = workbook.addImage({
+                         buffer: imageBuffer as any,
+                         extension: 'png',
+                    });
+                    worksheet.addImage(imageId, {
+                         tl: {
+                              col: Number(selloJefeCell.col) - 1,
+                              row: Number(selloJefeCell.row) - 1
+                         },
+                         ext: { width, height }
+                    });
+                    selloJefeCell.value = '';
+                    resolve();
+               };
+               img.onerror = () => {
+                    if (!selloJefeCell) {
+                         resolve();
+                         return;
+                    }
+                    const imageId = workbook.addImage({
+                         buffer: imageBuffer as any,
+                         extension: 'png',
+                    });
+                    worksheet.addImage(imageId, {
+                         tl: {
+                              col: Number(selloJefeCell.col) - 1,
+                              row: Number(selloJefeCell.row) - 1
+                         },
+                         ext: { width: 80, height: 80 }
+                    });
+                    selloJefeCell.value = '';
+                    resolve();
+               };
           });
-          worksheet.addImage(imageId, {
-               tl: { 
-                    col: Number(selloJefeCell.col) - 1, 
-                    row: Number(selloJefeCell.row) - 1 
-               },
-               ext: { width: 80, height: 80 } // Adjust size as needed
-          });
-          // Optionally clear the placeholder text
-          (selloJefeCell as ExcelJS.Cell).value = '';
      }
 
      // Find the row index where the table starts
@@ -135,6 +167,15 @@ export async function generateExcelFromTemplate(departamento: string, fecha: str
           });
           rowSalida.commit();
      });
+
+     // Encuentra la columna de la celda original de selloJefe
+     let selloJefeCol = 1;
+     if (selloJefeCell) {
+          selloJefeCol = Number(selloJefeCell.col);
+     }
+
+     // Calcula la fila destino para la imagen (después de las marcadas)
+     const offsetExtra = 2; // Puedes ajustar este valor para dejar más espacio
 
      // Generate the Excel file as a Blob
      const buffer = await workbook.xlsx.writeBuffer();

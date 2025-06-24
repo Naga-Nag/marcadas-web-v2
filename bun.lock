@@ -8,6 +8,7 @@
         "@types/jsonwebtoken": "^9.0.9",
         "@types/mssql": "^9.1.7",
         "bcryptjs": "^3.0.2",
+        "buffer": "^6.0.3",
         "date-fns": "^4.1.0",
         "exceljs": "^4.4.0",
         "jsonwebtoken": "^9.0.2",
