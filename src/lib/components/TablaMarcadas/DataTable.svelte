@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { List } from 'svelte-virtual';
 	import EditableCell from './EditableCell.svelte';
-	import { isAdmin } from '$lib/stores/usuario';
 	import type { shortUsuario } from '$lib/types/gen';
 
 	type columnsType = {
