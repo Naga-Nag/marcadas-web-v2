@@ -31,19 +31,68 @@
 	});
 </script>
 
-<div class="main-container">
+<div class="app-layout">
 	<div id="portal-host"></div>
 	<NotificationContainer />
 	
-	{@render children()}
+	<div class="main-container">
+		{@render children()}
+	</div>
 </div>
 
 <style>
-	.main-container {
-		margin-top: 3.5rem;
+	.app-layout {
+		position: relative;
+		min-height: 100vh;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		overflow-x: hidden;
 	}
+
+	.main-container {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		padding: 0;
+		margin: 0;
+		width: 100%;
+		max-width: 100vw;
+		overflow-x: hidden;
+	}
+	
 	#portal-host {
 		position: absolute;
-		z-index: 101; /* Ensure it appears above other elements */
+		z-index: 101;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+	}
+
+	#portal-host > * {
+		pointer-events: auto;
+	}
+
+	/* ===== SCROLL BEHAVIOR ===== */
+	.main-container {
+		scroll-behavior: smooth;
+	}
+
+	/* ===== GLOBAL ANIMATIONS ===== */
+	.main-container > * {
+		animation: fadeInUp 0.5s ease-out;
+	}
+
+	@keyframes fadeInUp {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 </style>

@@ -77,196 +77,511 @@
     }
 </script>
 
-<main>
-    <a href="/admin/usuarios" class="btn primary-btn">Volver</a>
-    <h1>Administrar Departamentos</h1>
-    <button on:click={() => openEditForm({ Deptid: 0, DeptName: '', SelloJefe: null, leyendaJefe: '' })} class="btn primary-btn">Nuevo Departamento</button>
+<header class="admin-header">
+    <nav class="breadcrumb">
+        <a href="/admin/usuarios" class="btn primary-btn breadcrumb-link">
+            <span>← Volver a Usuarios</span>
+        </a>
+    </nav>
+    
+    <div class="page-title">
+        <h1>Administrar Departamentos</h1>
+        <p class="page-subtitle">Gestión de departamentos y configuraciones</p>
+    </div>
+</header>
 
-    {#if showEditForm}
-        <div class="register-form-overlay" transition:fade>
-            <div class="register-form">
-                <button on:click={closeForm} class="close-button" aria-label="Cerrar">&times;</button>
-                <h3>{editingDeptid ? 'Editar Departamento' : 'Nuevo Departamento'}</h3>
-                {#if error}
-                    <div class="error">{error}</div>
-                {/if}
-                <form on:submit|preventDefault={handleSubmit}>
-                    <label>
-                        Nombre:
-                        <input type="text" bind:value={form.DeptName} required />
-                    </label>
-                    <label>
-                        Leyenda del Jefe:
-                        <input type="text" bind:value={form.leyendaJefe} />
-                    </label>
-                    <label>
-                        Sello del Jefe:
-                        <input type="file" accept="image/*" on:change={handleFileChange} />
-                        {#if selloPreview}
-                            <img src={"data:image/png;base64," + (form.SelloJefe ?? '')} alt="Sello Jefe" style="max-width:120px;max-height:120px;margin-top:10px;" />
-                        {/if}
-                    </label>
-                    <div class="form-actions">
-                        <button class="btn primary-btn" type="submit" disabled={loading}>
-                            {editingDeptid ? 'Actualizar' : 'Crear'}
-                        </button>
-                        <button type="button" class="btn secondary-btn" on:click={closeForm}>Cancelar</button>
-                    </div>
-                </form>
+<main class="admin-content">
+    <section class="departments-section">
+        <div class="section-header">
+            <div class="section-title">
+                <h2>Departamentos</h2>
+                <span class="dept-count">{departamentos.length} departamento{departamentos.length !== 1 ? 's' : ''}</span>
             </div>
+            <button 
+                on:click={() => openEditForm({ Deptid: 0, DeptName: '', SelloJefe: null, leyendaJefe: '' })} 
+                class="btn primary-btn action-btn"
+            >
+                <span>+ Nuevo Departamento</span>
+            </button>
         </div>
-    {/if}
 
-    <ul class="dept-list">
-        {#each departamentos as departamento (departamento.Deptid)}
-            <li class="dept-item" transition:slide>
-                <details>
-                    <summary>
-                        <span>{departamento.DeptName}</span>
-                        <button class="btn secondary-btn" on:click={() => openEditForm(departamento)}>Editar</button>
-                    </summary>
-                    <div class="dept-details">
-                        <p><strong>ID:</strong> {departamento.Deptid}</p>
-                        <p><strong>Nombre:</strong> {departamento.DeptName}</p>
-                        <p><strong>Leyenda Jefe:</strong> {departamento.leyendaJefe}</p>
-                        {#if departamento.SelloJefe}
-                            <p><strong>Sello Jefe:</strong></p>
-                            <img src={"data:image/png;base64," + departamento.SelloJefe} alt="Sello Jefe" style="max-width:120px;max-height:120px;" />
-                        {/if}
-                    </div>
-                </details>
-            </li>
-        {/each}
-    </ul>
+        {#if showEditForm}
+            <div class="register-form-overlay" transition:fade>
+                <div class="register-form">
+                    <header class="form-header">
+                        <h3>{editingDeptid ? 'Editar Departamento' : 'Nuevo Departamento'}</h3>
+                        <button on:click={closeForm} class="close-button" aria-label="Cerrar">&times;</button>
+                    </header>
+                    
+                    {#if error}
+                        <div class="error" role="alert">{error}</div>
+                    {/if}
+                    
+                    <form on:submit|preventDefault={handleSubmit} class="dept-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="deptName">
+                                    Nombre del Departamento:
+                                    <input 
+                                        id="deptName"
+                                        type="text" 
+                                        bind:value={form.DeptName} 
+                                        required 
+                                        placeholder="Ej: Recursos Humanos"
+                                    />
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="leyendaJefe">
+                                    Leyenda del Jefe:
+                                    <input 
+                                        id="leyendaJefe"
+                                        type="text" 
+                                        bind:value={form.leyendaJefe} 
+                                        placeholder="Ej: Director de Departamento"
+                                    />
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group seal-section">
+                            <label for="selloJefe">
+                                Sello del Jefe:
+                                <input 
+                                    id="selloJefe"
+                                    type="file" 
+                                    accept="image/*" 
+                                    on:change={handleFileChange}
+                                    class="file-input"
+                                />
+                                <div class="file-input-help">
+                                    Formatos aceptados: PNG, JPG, JPEG. Tamaño máximo: 2MB
+                                </div>
+                                {#if selloPreview}
+                                    <div class="seal-preview">
+                                        <img 
+                                            src={"data:image/png;base64," + (form.SelloJefe ?? '')} 
+                                            alt="Vista previa del sello" 
+                                            class="seal-image"
+                                        />
+                                        <p class="preview-label">Vista previa del sello</p>
+                                    </div>
+                                {/if}
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn primary-btn" type="submit" disabled={loading} class:loading>
+                                {editingDeptid ? 'Actualizar' : 'Crear'}
+                            </button>
+                            <button type="button" class="btn secondary-btn" on:click={closeForm}>
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {/if}
+
+        <div class="departments-container">
+            {#if departamentos.length === 0}
+                <div class="empty-state">
+                    <p>No hay departamentos registrados</p>
+                </div>
+            {:else}
+                <ul class="dept-list" role="list">
+                    {#each departamentos as departamento (departamento.Deptid)}
+                        <li class="dept-item" transition:slide>
+                            <details class="dept-details-toggle">
+                                <summary class="dept-summary">
+                                    <div class="dept-info">
+                                        <span class="dept-name">{departamento.DeptName}</span>
+                                        <span class="dept-id">ID: {departamento.Deptid}</span>
+                                    </div>
+                                    <div class="dept-actions">
+                                        <button 
+                                            class="btn secondary-btn" 
+                                            on:click|stopPropagation={() => openEditForm(departamento)}
+                                            aria-label="Editar departamento {departamento.DeptName}"
+                                        >
+                                            Editar
+                                        </button>
+                                    </div>
+                                </summary>
+                                <div class="dept-details">
+                                    <div class="details-grid">
+                                        <div class="detail-item">
+                                            <strong>ID:</strong> 
+                                            <span>{departamento.Deptid}</span>
+                                        </div>
+                                        <div class="detail-item">
+                                            <strong>Nombre:</strong> 
+                                            <span>{departamento.DeptName}</span>
+                                        </div>
+                                        <div class="detail-item full-width">
+                                            <strong>Leyenda Jefe:</strong> 
+                                            <span>{departamento.leyendaJefe || 'No especificada'}</span>
+                                        </div>
+                                        {#if departamento.SelloJefe}
+                                            <div class="detail-item full-width">
+                                                <strong>Sello del Jefe:</strong>
+                                                <div class="seal-display">
+                                                    <img 
+                                                        src={"data:image/png;base64," + departamento.SelloJefe} 
+                                                        alt="Sello del jefe de {departamento.DeptName}" 
+                                                        class="seal-image"
+                                                    />
+                                                </div>
+                                            </div>
+                                        {/if}
+                                    </div>
+                                </div>
+                            </details>
+                        </li>
+                    {/each}
+                </ul>
+            {/if}
+        </div>
+    </section>
 </main>
 
 <style>
-main {
+/* ===== ADMIN HEADER ===== */
+.admin-header {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+}
+
+.breadcrumb {
     max-width: 900px;
     margin: 0 auto;
-    padding: 2em 1em;
+    padding: 0 1rem;
+    margin-bottom: 1rem;
 }
-h1 {
+
+.breadcrumb-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-title {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1rem;
     text-align: center;
+}
+
+.page-title h1 {
     color: #ffffff;
-    margin-bottom: 1em;
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
 }
-.btn {
-    padding: 0.5em 1.2em;
-    border-radius: 6px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-    margin-right: 0.5em;
+
+.page-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    font-size: 1rem;
 }
-.primary-btn {
-    background: #1976d2;
-    color: #fff;
+
+/* ===== MAIN CONTENT ===== */
+.admin-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1rem;
 }
-.primary-btn:hover {
-    background: #125ea6;
+
+.departments-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 2rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
-.secondary-btn {
-    background: #e3f0fc;
-    color: #1976d2;
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+    gap: 1rem;
 }
-.secondary-btn:hover {
-    background: #b3c6e6;
-}
-.dept-list {
-    list-style: none;
-    padding: 0;
-    max-width: 800px;
-    margin: 2em auto 0 auto;
-}
-.dept-item {
-    background: #fff;
-    border: 1px solid #e0e7ef;
-    border-radius: 10px;
-    margin-bottom: 12px;
-    padding: 15px;
-    box-shadow: 0 3px 6px rgba(25, 118, 210, 0.07);
-    transition: transform 0.2s;
-}
-.dept-item:hover {
-    transform: scale(1.02);
-}
-.register-form-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.6);
+
+.section-title {
     display: flex;
     align-items: center;
-    justify-content: center;
-    z-index: 1000;
+    gap: 1rem;
 }
-.register-form {
+
+.section-title h2 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.dept-count {
+    background: rgba(25, 118, 210, 0.2);
+    color: #ffffff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.action-btn {
+    white-space: nowrap;
+}
+
+/* ===== FORM IMPROVEMENTS ===== */
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(25, 118, 210, 0.1);
+}
+
+.form-header h3 {
+    margin: 0;
+    color: #1976d2;
+    font-size: 1.3em;
+}
+
+.dept-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.seal-section {
+    grid-column: 1 / -1;
+}
+
+.file-input {
+    margin-bottom: 0.5rem;
+}
+
+.file-input-help {
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.seal-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(25, 118, 210, 0.05);
+    border-radius: 8px;
+    border: 2px dashed rgba(25, 118, 210, 0.2);
+}
+
+.seal-image {
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 2px solid #e3f2fd;
     background: white;
-    padding: 2em 1.5em 1.5em 1.5em;
-    border-radius: 12px;
-    box-shadow: 0 5px 10px rgba(25, 118, 210, 0.13);
-    width: 420px;
-    text-align: center;
+    padding: 0.5rem;
+}
+
+.preview-label {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #1976d2;
+    font-weight: 600;
+}
+
+/* ===== DEPARTMENT LIST IMPROVEMENTS ===== */
+.departments-container {
     position: relative;
+    min-height: 200px;
 }
-.close-button {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 22px;
-    border: none;
-    background: none;
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+
+.dept-details-toggle {
+    width: 100%;
+}
+
+.dept-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     cursor: pointer;
-    color: #e53935;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    list-style: none;
 }
-.close-button:hover {
-    color: #a71d2a;
+
+.dept-summary:hover {
+    background: rgba(25, 118, 210, 0.05);
 }
-label {
-    display: block;
-    margin-bottom: 12px;
+
+.dept-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.dept-name {
     font-weight: 600;
     color: #1976d2;
-    text-align: left;
+    font-size: 1.1rem;
 }
-input[type="text"],
-input[type="password"],
-select {
-    padding: 0.5em;
-    border: 1.5px solid #60a5fa;
-    border-radius: 6px;
-    font-size: 1em;
-    width: 100%;
-    margin-top: 0.2em;
+
+.dept-id {
+    background: rgba(25, 118, 210, 0.1);
+    color: #1976d2;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
-.form-actions {
+
+.dept-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 0.7em;
-    margin-top: 1.2em;
+    gap: 0.5rem;
+    align-items: center;
 }
-.dept-details {
-    margin-top: 10px;
-    padding: 15px;
-    background-color: #f8fbff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(25, 118, 210, 0.07);
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
 }
-.dept-details p {
-    margin: 5px 0;
-    font-size: 15px;
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.detail-item strong {
+    color: #1976d2;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.detail-item span {
     color: #333;
+    font-size: 0.95rem;
 }
-.error {
-    color: #fff;
-    background: #e53935;
-    padding: 0.7em 1em;
-    border-radius: 6px;
-    margin-bottom: 1em;
-    text-align: left;
+
+.seal-display {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(25, 118, 210, 0.05);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .section-title {
+        justify-content: center;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dept-summary {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .dept-info {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .dept-actions {
+        justify-content: center;
+    }
+
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .departments-section {
+        padding: 1rem;
+    }
+
+    .seal-image {
+        max-width: 120px;
+        max-height: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dept-info {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .seal-image {
+        max-width: 100px;
+        max-height: 100px;
+    }
+}
+
+/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+.dept-summary:focus {
+    outline: 2px solid #1976d2;
+    outline-offset: 2px;
+}
+
+.dept-summary::marker {
+    color: #1976d2;
+}
+
+.file-input:focus {
+    outline: 2px solid #1976d2;
+    outline-offset: 2px;
 }
 </style>

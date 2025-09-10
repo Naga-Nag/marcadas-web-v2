@@ -211,28 +211,33 @@
 </div>
 
 <style>
-	:global(body) {
-		background: linear-gradient(135deg, #1a6fc9 0%, #0d47a1 50%, #002171 100%);
-		font-family: 'Comfortaa', Arial, sans-serif;
-	}
-
 	.tabla-marcadas {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		padding: 32px 12px 24px 12px;
-
-		width: 100vw;
+		width: 100%;
+		max-width: 100%;
 		box-sizing: border-box;
+		overflow-x: hidden;
 	}
 
 	.botonera {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		gap: 12px;
+		gap: 0.75rem;
 		width: 100%;
-		max-width: 98vw;
+		max-width: fit-content;
+		flex-wrap: nowrap;
+		justify-content: center;
+		margin: 0 auto 1.5rem auto;
+		padding: 1rem;
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 16px;
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	}
 
 	.grid-container {
@@ -240,11 +245,12 @@
 		justify-content: center;
 		width: 100%;
 		margin-top: 18px;
+		overflow-x: auto;
 	}
 
 	.grid {
 		width: 100%;
-		max-width: 98vw;
+		max-width: 100%;
 		background: rgba(255, 255, 255, 0.97);
 		border-radius: 16px;
 		box-shadow: 0 6px 32px 0 #1a6fc933;
@@ -255,24 +261,48 @@
 	.excel-btn {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		background: linear-gradient(90deg, #1976d2 60%, #60a5fa 100%);
-		color: #fff;
+		gap: 0.5rem;
+		background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+		color: white;
 		border: none;
-		border-radius: 8px;
-		padding: 10px 22px;
-		font-size: 1.1em;
+		border-radius: 12px;
+		padding: 0.75rem 1.25rem;
+		font-size: 0.95rem;
 		font-weight: 600;
-		box-shadow: 0 2px 8px #1976d233;
-		margin: 0 0 18px 0;
+		box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+		margin: 0;
 		cursor: pointer;
-		transition:
-			background 0.2s,
-			transform 0.2s;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		position: relative;
+		overflow: hidden;
+		min-height: 48px;
+		white-space: nowrap;
 	}
+
+	.excel-btn::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: -100%;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+		transition: left 0.6s;
+	}
+
+	.excel-btn:hover::before {
+		left: 100%;
+	}
+
 	.excel-btn:hover {
-		background: linear-gradient(90deg, #125ea6 60%, #60a5fa 100%);
-		transform: scale(1.04);
+		background: linear-gradient(135deg, #059669 0%, #047857 100%);
+		transform: translateY(-2px);
+		box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+	}
+
+	.excel-btn:active {
+		transform: translateY(0);
+		box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
 	}
 
 	.no-marcadas {
@@ -328,10 +358,85 @@
 
 	/* Responsive */
 	@media (max-width: 900px) {
-		.grid,
 		.tabla-marcadas {
-			max-width: 100vw;
-			padding: 0;
+			padding: 16px 8px;
+		}
+
+		.botonera {
+			flex-wrap: wrap;
+			max-width: 100%;
+			gap: 0.5rem;
+			padding: 0.75rem;
+		}
+
+		.grid {
+			max-width: 100%;
+			border-radius: 8px;
+		}
+
+		.excel-btn {
+			font-size: 0.9rem;
+			padding: 0.625rem 1rem;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.tabla-marcadas {
+			padding: 12px 4px;
+		}
+
+		.botonera {
+			flex-direction: column;
+			gap: 0.75rem;
+			align-items: stretch;
+			padding: 1rem;
+		}
+
+		.grid {
+			border-radius: 4px;
+		}
+
+		.excel-btn {
+			width: 100%;
+			justify-content: center;
+		}
+	}
+
+	/* ===== OPTIMIZACIÓN PARA MONITORES GRANDES ===== */
+	@media (min-width: 1920px) {
+		.tabla-marcadas {
+			padding: 40px 20px 32px 20px;
+		}
+
+		.botonera {
+			gap: 1rem;
+			padding: 1.25rem;
+		}
+
+		.excel-btn {
+			font-size: 1rem;
+			padding: 0.875rem 1.5rem;
+		}
+	}
+
+	@media (min-width: 2560px) {
+		.tabla-marcadas {
+			padding: 48px 24px 40px 24px;
+		}
+
+		.botonera {
+			gap: 1.25rem;
+			padding: 1.5rem;
+		}
+
+		.excel-btn {
+			font-size: 1.1rem;
+			padding: 1rem 1.75rem;
+		}
+
+		.no-marcadas {
+			font-size: 1.3em;
+			padding: 1.5em 3em;
 		}
 	}
 </style>
