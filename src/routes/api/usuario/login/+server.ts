@@ -1,6 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { getUsuario } from '$lib/server/usuarios';
-import jwt from 'jsonwebtoken';
+import { loginWebUser } from '$lib/server/usuarios';
 
 export async function POST({ request, cookies }) {
     try {
@@ -10,8 +9,14 @@ export async function POST({ request, cookies }) {
             return json({ error: 'Faltan credenciales' }, { status: 400 });
         }
 
-        const token = jwt.sign({ username }, Bun.env.JWT_SECRET!, { expiresIn: '8h' });
-
+        const result = await loginWebUser(username, password);
+        
+        if ('error' in result) {
+            return json({ error: result.error }, { status: 401 });
+        }
+        
+        const { WebUser, token } = result;
+        
         cookies.set('token', token, {
             path: '/',
             httpOnly: true,
@@ -19,9 +24,12 @@ export async function POST({ request, cookies }) {
             secure: Bun.env.BUILD === 'production',
             maxAge: 60 * 60 * 8 // 8 horas
         });
-        const usuario = await getUsuario(username);
+        
+        // Return user data without password
+        const { password: _, ...usuario } = WebUser;
         return json({ ok: true, usuario });
     } catch (err) {
-        return json({ error: 'Credenciales inválidas' }, { status: 401 });
+        console.error('Login error:', err);
+        return json({ error: 'Error interno del servidor' }, { status: 500 });
     }
 }

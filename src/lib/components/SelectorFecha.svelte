@@ -72,12 +72,11 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.5rem;
-		padding: 1rem;
+		padding: 0.5rem;
 		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 		border-radius: 16px;
 		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 		border: 1px solid rgba(226, 232, 240, 0.8);
-		backdrop-filter: blur(10px);
 		max-width: fit-content;
 		margin: 0 auto;
 	}

@@ -35,21 +35,19 @@
 
 <style>
 	.selector-departamento {
-		display: flex;
-		gap: 0.75rem;
-		margin-bottom: 1.5rem;
-		overflow-x: auto;
-		overflow-y: hidden;
-		white-space: nowrap;
-		max-width: 100%;
-		padding: 1rem;
+		overflow-x: scroll; /* Force scrollbar to always appear */
+		padding: 0.5rem;
 		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-		border-radius: 16px;
-		backdrop-filter: blur(10px);
+		border-radius: 6px;
 		border: 1px solid rgba(226, 232, 240, 0.8);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-		justify-content: center;
-		flex-wrap: wrap;
+		margin-bottom: 0.5rem;
+		width: 100%;
+		/* Use white-space approach instead of flexbox */
+		white-space: nowrap;
+		/* Add standard scrollbar properties */
+		scrollbar-width: thin;
+		scrollbar-color: #667eea #e2e8f0;
 	}
 
 	.selector-departamento::-webkit-scrollbar {
@@ -67,21 +65,19 @@
 	}
 
 	button {
-		padding: 0.875rem 1.5rem;
-		border-radius: 12px;
+		border-radius: 6px;
 		border: 2px solid transparent;
 		background: rgba(255, 255, 255, 0.8);
 		color: #374151;
 		cursor: pointer;
 		font-weight: 600;
-		font-size: 0.95rem;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-		position: relative;
+		transition: all 0.3s cubic-bezier(0.4, 0.2, 1);
 		overflow: hidden;
-		min-height: 48px;
-		white-space: nowrap;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-		backdrop-filter: blur(10px);
+		min-width: fit-content;
+		/* Use inline-block for white-space approach */
+		display: inline-block;
+		margin-right: 0.75rem;
 	}
 
 	button::before {
@@ -159,25 +155,19 @@
 	/* Responsive design */
 	@media (max-width: 768px) {
 		.selector-departamento {
-			gap: 0.5rem;
 			padding: 0.75rem;
-			justify-content: flex-start;
-			flex-wrap: nowrap;
-			overflow-x: auto;
 		}
 
 		button {
 			padding: 0.75rem 1.25rem;
 			font-size: 0.9rem;
 			min-width: 120px;
-			flex-shrink: 0;
 		}
 	}
 
 	@media (max-width: 480px) {
 		.selector-departamento {
 			padding: 0.5rem;
-			gap: 0.375rem;
 		}
 
 		button {

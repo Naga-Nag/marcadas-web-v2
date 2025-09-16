@@ -51,10 +51,10 @@
 	$effect(() => {
 		if (selectedOpcion === 'estandar') {
 			columns = [
-				{ id: 'Personal.MR', width: 80, header: 'MR', footer: 'MR', type: 'text' },
+				{ id: 'Personal.MR', width: 50, header: 'MR', footer: 'MR', type: 'text' },
 				{ id: 'Personal.CUIL', width: 100, header: 'CUIL', footer: 'CUIL', type: 'text' },
-				{ id: 'Personal.Nombre', width: 180, header: 'Nombre', footer: 'Nombre', type: 'text' },
-				{ id: 'Personal.Departamento', width: 80, header: 'Departamento', footer: 'Departamento', type: 'text' },
+				{ id: 'Personal.Nombre', width: 240, header: 'Nombre', footer: 'Nombre', type: 'text' },
+				{ id: 'Personal.Departamento', width: 80, header: 'Depto', footer: 'Departamento', type: 'text' },
 				{ id: 'Salida', width: 120, header: 'Salida', footer: 'Salida', type: 'text' },
 				{ id: 'Entrada', width: 120, header: 'Entrada', footer: 'Entrada', type: 'text' },
 				{ id: 'Estado', width: 120, header: 'Estado', footer: 'Estado', type: 'text' },

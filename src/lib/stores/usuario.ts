@@ -16,7 +16,7 @@ export const setUsuario = (user: shortUsuario) => {
 };
 
 export const clearUsuario = () => {
-    usuarioStore.set({} as shortUsuario);
+    usuarioStore.set(null);
 }
 
 export const isLoggedIn = () => {

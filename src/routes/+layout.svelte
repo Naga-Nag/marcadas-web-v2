@@ -10,9 +10,9 @@
 	onMount(() => {
 		if (typeof document !== 'undefined') {
 			// Register the portal host
-			const portalHost = document.getElementById('portal-host');
-			if (portalHost) {
-				createPortal(portalHost);
+			const portalHosts = document.getElementsByClassName('portal-host');
+			if (portalHosts.length > 0) {
+				createPortal(portalHosts[0]);
 			}
 		}
 		if (resto.data.usuario) {
@@ -23,16 +23,16 @@
 	onDestroy(() => {
 		if (typeof document !== 'undefined') {
 			// Clean up the portal host
-			const portalHost = document.getElementById('portal-host');
-			if (portalHost) {
-				portalHost.innerHTML = '';
+			const portalHosts = document.getElementsByClassName('portal-host');
+			for (let i = 0; i < portalHosts.length; i++) {
+				portalHosts[i].innerHTML = '';
 			}
 		}
 	});
 </script>
 
 <div class="app-layout">
-	<div id="portal-host"></div>
+	<div class="portal-host"></div>
 	<NotificationContainer />
 	
 	<div class="main-container">
@@ -61,7 +61,7 @@
 		overflow-x: hidden;
 	}
 	
-	#portal-host {
+	.portal-host {
 		position: absolute;
 		z-index: 101;
 		top: 0;
@@ -69,10 +69,6 @@
 		width: 100%;
 		height: 100%;
 		pointer-events: none;
-	}
-
-	#portal-host > * {
-		pointer-events: auto;
 	}
 
 	/* ===== SCROLL BEHAVIOR ===== */

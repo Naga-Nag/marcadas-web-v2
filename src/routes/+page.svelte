@@ -21,9 +21,8 @@
 	onMount(async () => {
 		if (resto.data.usuario?.role === 'ADMIN') {
 			departamentosPermitidos = await fetchDepartamentos();
-		}
-		else {
-			selectedDepartamento = await fetchDepartamentoByName(resto.data.usuario?.departamento)
+		} else {
+			selectedDepartamento = await fetchDepartamentoByName(resto.data.usuario?.departamento);
 			console.log('selectedDepartamento', selectedDepartamento);
 		}
 		if (browser) {
@@ -38,7 +37,7 @@
 <header class="app-header">
 	<div class="header-content">
 		<h1>Marcadas Web</h1>
-		
+
 		<nav class="header-nav">
 			<div class="user-actions">
 				<button
@@ -56,12 +55,24 @@
 				<div class="admin-nav">
 					<span class="nav-separator"></span>
 					<a href="/admin/usuarios" class="admin-link" title="Gestionar Usuarios">
-						<img src="personas.png" alt="Gestionar Usuarios" width="30" height="30" class="admin-icon" />
+						<img
+							src="personas.png"
+							alt="Gestionar Usuarios"
+							width="30"
+							height="30"
+							class="admin-icon"
+						/>
 						<span class="admin-label">Usuarios</span>
 					</a>
 					<span class="nav-separator"></span>
 					<a href="/admin/departamentos" class="admin-link" title="Gestionar Departamentos">
-						<img src="departamentos.png" alt="Gestionar Departamentos" width="30" height="30" class="admin-icon" />
+						<img
+							src="departamentos.png"
+							alt="Gestionar Departamentos"
+							width="30"
+							height="30"
+							class="admin-icon"
+						/>
 						<span class="admin-label">Departamentos</span>
 					</a>
 				</div>
@@ -71,27 +82,19 @@
 </header>
 
 <main class="main-content">
-	<section class="tabla-section">
-		<div class="section-header">
-			<h2>Sistema de Marcadas</h2>
-			{#if selectedDepartamento}
-				<p class="department-info">Departamento: <strong>{selectedDepartamento.DeptName}</strong></p>
-			{:else if resto.data.usuario?.role === 'ADMIN'}
-				<p class="admin-info">Vista de administrador - Todos los departamentos</p>
-			{/if}
-		</div>
-		
-		<div class="tabla-container">
-			<Tabla {selectedDepartamento} departamentos={departamentosPermitidos} usuario={resto.data.usuario} />
-		</div>
-	</section>
+	<div class="tabla-container">
+		<Tabla
+			{selectedDepartamento}
+			departamentos={departamentosPermitidos}
+			usuario={resto.data.usuario}
+		/>
+	</div>
 </main>
 
 <style>
 	/* ===== HEADER STYLES ===== */
 	.app-header {
 		background: rgba(255, 255, 255, 0.05);
-		backdrop-filter: blur(10px);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		padding: 1.5rem 0;
 		margin-bottom: 2rem;
@@ -194,47 +197,6 @@
 		width: 100%;
 		box-sizing: border-box;
 		overflow-x: hidden;
-	}
-
-	.tabla-section {
-		background: rgba(255, 255, 255, 0.03);
-		border-radius: 16px;
-		padding: 1rem;
-		backdrop-filter: blur(10px);
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		width: 100%;
-		box-sizing: border-box;
-		max-width: 100%;
-		overflow: hidden;
-	}
-
-	.section-header {
-		text-align: center;
-		margin-bottom: 2rem;
-		padding-bottom: 1rem;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-		width: 100%;
-	}
-
-	.section-header h2 {
-		color: #ffffff;
-		font-size: 1.8rem;
-		margin: 0 0 0.5rem 0;
-		font-weight: 600;
-		text-align: center;
-	}
-
-	.department-info,
-	.admin-info {
-		color: rgba(255, 255, 255, 0.8);
-		font-size: 1rem;
-		margin: 0;
-		text-align: center;
-	}
-
-	.department-info strong {
-		color: #ffffff;
-		font-weight: 600;
 	}
 
 	.tabla-container {
@@ -340,7 +302,7 @@
 		.main-content {
 			max-width: 95vw;
 		}
-		
+
 		.tabla-section {
 			padding: 2.5rem;
 		}

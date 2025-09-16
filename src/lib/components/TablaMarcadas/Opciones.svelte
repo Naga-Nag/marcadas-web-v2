@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	let open = $state(false);
 	let selected = $state('delDia');
+	let menuElement: HTMLElement | null = $state(null);
+	let ignoreClickOutside = $state(false);
 
 	let {
 		selectedOpcion = $bindable(),
@@ -23,22 +25,56 @@
 		ocultarInactivos = !ocultarInactivos;
 	}
 
+	function updateMenuPosition() {
+		// Simple positioning - let CSS handle it
+	}
+
+	function handleClickOutside(event: Event) {
+		// If we just opened the dropdown, ignore this click
+		if (ignoreClickOutside) {
+			ignoreClickOutside = false;
+			return;
+		}
+		
+		const target = event.target as HTMLElement;
+		if (!target.closest('.opciones-dropdown')) {
+			open = false;
+		}
+	}
+
+	function handleResize() {
+		if (open) {
+			updateMenuPosition();
+		}
+	}
+
 	onMount(() => {
 		if (selectedOpcion) selected = selectedOpcion;
 		if (ocultarInactivos !== undefined) ocultarInactivos = ocultarInactivos;
 		
-		// Si clickea fuera del menú, lo cierra
-		document.addEventListener('click', (event) => {
-			const target = event.target as HTMLElement;
-			if (!target.closest('.opciones-dropdown')) {
-				open = false;
-			}
-		});
+		// Add event listeners
+		document.addEventListener('click', handleClickOutside);
+		window.addEventListener('resize', handleResize);
+	});
+
+	onDestroy(() => {
+		// Clean up event listeners
+		document.removeEventListener('click', handleClickOutside);
+		window.removeEventListener('resize', handleResize);
+	});
+
+	$effect(() => {
+		if (open) {
+			// Use setTimeout to ensure DOM is updated before calculating position
+			setTimeout(() => {
+				updateMenuPosition();
+			}, 0);
+		}
 	});
 </script>
 
-<div class="opciones-dropdown">
-	<button class="opciones-btn" onclick={() => (open = !open)} aria-label="Abrir opciones" aria-expanded={open}>
+<div class="opciones-dropdown" >
+	<button class="opciones-btn" onclick={(e) => { e.stopPropagation(); ignoreClickOutside = true; open = !open; }} aria-label="Abrir opciones" aria-expanded={open}>
 		<div class="icon-container" class:rotating={open}>
 			<svg class="cog-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -113,6 +149,7 @@
 		position: relative;
 		display: inline-block;
 		margin-bottom: 1em;
+		z-index: 9999;
 	}
 
 	.opciones-btn {
@@ -202,7 +239,7 @@
 			0 10px 10px -5px rgba(0, 0, 0, 0.04),
 			0 0 0 1px rgba(102, 126, 234, 0.05);
 		min-width: 280px;
-		z-index: 100;
+		z-index: 9999;
 		padding: 1.5rem;
 		opacity: 0;
 		transform: translateY(-10px) scale(0.95);
