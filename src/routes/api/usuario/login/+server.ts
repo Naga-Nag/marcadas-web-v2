@@ -25,9 +25,9 @@ export async function POST({ request, cookies }) {
             maxAge: 60 * 60 * 8 // 8 horas
         });
         
-        // Return user data without password
+        // Return user data without password and token for client-side storage
         const { password: _, ...usuario } = WebUser;
-        return json({ ok: true, usuario });
+        return json({ user: usuario, token });
     } catch (err) {
         console.error('Login error:', err);
         return json({ error: 'Error interno del servidor' }, { status: 500 });

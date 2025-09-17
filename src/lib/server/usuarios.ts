@@ -48,6 +48,7 @@ export async function getUsuarios(): Promise<Usuario[]> {
 
 export async function getUsuario(username: string): Promise<Usuario | null> {
      try {
+          console.log("DB :: getUsuario: Fetching user", username);
           return new Promise((resolve, reject) => {
                const request = connection.request();
                request.input("username", sql.NVarChar, username);
@@ -57,6 +58,7 @@ export async function getUsuario(username: string): Promise<Usuario | null> {
 
                let usuario: Usuario | null = null;
                request.on("row", (row) => {
+                    console.log("DB :: getUsuario: User row received", { username: row.username, role: row.role });
                     // Asegúrate de parsear si es string
                     if (typeof row.departamentosPermitidos === 'string') {
                          try {
@@ -70,18 +72,18 @@ export async function getUsuario(username: string): Promise<Usuario | null> {
                });
 
                request.on("done", () => {
-                    console.log("DB :: fetchUsuario:", usuario);
+                    console.log("DB :: getUsuario: User fetch completed", { userFound: !!usuario, username });
                     resolve(usuario);
                });
 
                request.on("error", (err) => {
-                    console.error("DB :: fetchUsuario: SQL Error:", err);
+                    console.error("DB :: getUsuario: SQL Error:", err);
                     reject(err);
                });
           });
 
      } catch (err) {
-          console.error("Error in fetchUsuario:", err);
+          console.error("DB :: getUsuario: Error fetching user", username, err);
           throw new Error("Error fetching usuario");
      }
 }
@@ -213,7 +215,7 @@ async function UserfromUID(uid: string): Promise<Record<string, any>> {
 
 export async function loginWebUser(username: string, password: string): Promise<{ WebUser: Usuario, token: string } | { error: string }> {
      try {
-          console.log("DB :: loginWebUser:", username);
+          console.log("DB :: loginWebUser: Attempting login for user", username);
 
           return new Promise((resolve, reject) => {
                const request = connection.request();
@@ -226,13 +228,14 @@ export async function loginWebUser(username: string, password: string): Promise<
                request.query(query);
 
                request.on("row", async (row) => {
-                    console.log("DB :: loginWebUser row:", row);
+                    console.log("DB :: loginWebUser: User found in database", { username: row.username, role: row.role });
                     userFound = true;
 
                     try {
                          const isPasswordValid = await bcrypt.compare(password, row.password);
+                         console.log("DB :: loginWebUser: Password validation result", isPasswordValid);
                          if (!isPasswordValid) {
-                              console.warn("DB :: loginWebUser: Invalid password");
+                              console.warn("DB :: loginWebUser: Invalid password for user", username);
                               return resolve({ error: "Credenciales incorrectas" });
                          }
 
@@ -241,7 +244,7 @@ export async function loginWebUser(username: string, password: string): Promise<
                          }
 
                          const token = jwt.sign({ username }, Bun.env.JWT_SECRET, { expiresIn: "1h" });
-                         console.log("DB :: loginWebUser: JWT issued");
+                         console.log("DB :: loginWebUser: JWT token issued for user", username);
 
                          resolve({
                               WebUser: {
@@ -255,26 +258,28 @@ export async function loginWebUser(username: string, password: string): Promise<
                               token
                          });
                     } catch (error) {
-                         console.error("Error comparing passwords:", error);
+                         console.error("DB :: loginWebUser: Error comparing passwords for user", username, error);
                          reject({ error: "Authentication failed" });
                     }
                });
 
                request.on("done", () => {
                     if (!userFound) {
-                         console.warn("DB :: loginWebUser: User not found");
+                         console.warn("DB :: loginWebUser: User not found in database", username);
                          resolve({ error: "User not found" });
+                    } else {
+                         console.log("DB :: loginWebUser: Login process completed for user", username);
                     }
                });
 
                request.on("error", (err) => {
-                    console.error("DB :: loginWebUser: SQL Error:", err);
+                    console.error("DB :: loginWebUser: SQL Error for user", username, err);
                     reject({ error: "Authentication failed" });
                });
           });
 
      } catch (err) {
-          console.error("Error in loginWebUser:", err);
+          console.error("DB :: loginWebUser: Unexpected error", err);
           throw new Error("Authentication failed");
      }
 }

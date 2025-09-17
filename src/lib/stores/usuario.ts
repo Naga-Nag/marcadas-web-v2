@@ -5,6 +5,7 @@ import type { shortUsuario } from '$lib/types/gen';
 export const usuarioStore = writable<shortUsuario | null>(null);
 
 export const setUsuario = (user: shortUsuario) => {
+    console.log("STORE :: setUsuario: Setting user in store", user);
     let usuario: shortUsuario | null = {
         ipaddr: user.ipaddr || null,
         username: user.username,
@@ -16,6 +17,7 @@ export const setUsuario = (user: shortUsuario) => {
 };
 
 export const clearUsuario = () => {
+    console.log("STORE :: clearUsuario: Clearing user from store");
     usuarioStore.set(null);
 }
 

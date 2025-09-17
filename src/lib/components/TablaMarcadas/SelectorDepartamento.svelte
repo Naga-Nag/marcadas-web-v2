@@ -41,7 +41,6 @@
 		border-radius: 6px;
 		border: 1px solid rgba(226, 232, 240, 0.8);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-		margin-bottom: 0.5rem;
 		width: 100%;
 		/* Use white-space approach instead of flexbox */
 		white-space: nowrap;
@@ -71,24 +70,10 @@
 		color: #374151;
 		cursor: pointer;
 		font-weight: 600;
-		transition: all 0.3s cubic-bezier(0.4, 0.2, 1);
 		overflow: hidden;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 		min-width: fit-content;
-		/* Use inline-block for white-space approach */
-		display: inline-block;
-		margin-right: 0.75rem;
-	}
-
-	button::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: -100%;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
-		transition: left 0.6s;
+	
 	}
 
 	button:hover::before {
@@ -144,7 +129,6 @@
 		color: #6b7280;
 		font-style: italic;
 		text-align: center;
-		margin: 0;
 		padding: 1rem;
 		background: rgba(255, 255, 255, 0.5);
 		border-radius: 12px;

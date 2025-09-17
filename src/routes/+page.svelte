@@ -96,14 +96,12 @@
 	.app-header {
 		background: rgba(255, 255, 255, 0.05);
 		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-		padding: 1.5rem 0;
-		margin-bottom: 2rem;
+		padding: 0.5rem;
 		width: 100%;
 	}
 
 	.header-content {
 		max-width: 95vw;
-		margin: 0 auto;
 		padding: 0 1rem;
 		width: 100%;
 		box-sizing: border-box;
@@ -153,7 +151,7 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.8rem;
+		padding: 0.5rem;
 		border-radius: 12px;
 		transition: all 0.3s ease;
 		background: rgba(255, 255, 255, 0.1);
@@ -173,7 +171,6 @@
 		transition: transform 0.3s ease;
 		filter: brightness(1.2);
 		display: block;
-		margin: 0 auto;
 	}
 
 	.admin-link:hover .admin-icon {
@@ -203,163 +200,7 @@
 		position: relative;
 		min-height: 400px;
 		width: 100%;
-		overflow-x: auto;
+		overflow-x: visible;
 		overflow-y: visible;
-	}
-
-	/* ===== RESPONSIVE DESIGN ===== */
-	@media (max-width: 768px) {
-		.app-header {
-			padding: 1rem 0;
-		}
-
-		.header-content {
-			padding: 0 0.5rem;
-		}
-
-		.app-header h1 {
-			font-size: 2rem;
-		}
-
-		.header-nav {
-			flex-direction: column;
-			gap: 1.5rem;
-		}
-
-		.admin-nav {
-			justify-content: center;
-		}
-
-		.nav-separator {
-			display: none;
-		}
-
-		.main-content {
-			padding: 0 0.5rem;
-		}
-
-		.tabla-section {
-			padding: 0.5rem;
-			margin: 0;
-			border-radius: 8px;
-		}
-
-		.admin-link {
-			min-width: 70px;
-			padding: 0.6rem;
-		}
-
-		.admin-label {
-			font-size: 0.75rem;
-		}
-	}
-
-	@media (max-width: 480px) {
-		.app-header h1 {
-			font-size: 1.5rem;
-		}
-
-		.header-content {
-			padding: 0 0.25rem;
-		}
-
-		.main-content {
-			padding: 0 0.25rem;
-		}
-
-		.tabla-section {
-			padding: 0.25rem;
-			border-radius: 4px;
-		}
-
-		.admin-nav {
-			gap: 0.5rem;
-			flex-wrap: wrap;
-			justify-content: center;
-		}
-
-		.admin-link {
-			min-width: 60px;
-			padding: 0.5rem;
-		}
-
-		.admin-icon {
-			width: 24px !important;
-			height: 24px !important;
-		}
-
-		.admin-label {
-			font-size: 0.7rem;
-		}
-	}
-
-	/* ===== CORRECCIÓN DE CENTRADO ===== */
-	@media (min-width: 1200px) {
-		.header-content {
-			max-width: 95vw;
-		}
-
-		.main-content {
-			max-width: 95vw;
-		}
-
-		.tabla-section {
-			padding: 2.5rem;
-		}
-	}
-
-	/* ===== OPTIMIZACIÓN PARA MONITORES GRANDES ===== */
-	@media (min-width: 1920px) {
-		.header-content {
-			max-width: 92vw;
-			padding: 0 2rem;
-		}
-
-		.main-content {
-			max-width: 92vw;
-			padding: 0 2rem;
-		}
-
-		.tabla-section {
-			padding: 3rem;
-		}
-
-		.app-header h1 {
-			font-size: 3rem;
-		}
-
-		.section-header h2 {
-			font-size: 2.2rem;
-		}
-	}
-
-	/* ===== OPTIMIZACIÓN PARA 4K Y MONITORES ULTRAWIDE ===== */
-	@media (min-width: 2560px) {
-		.header-content {
-			max-width: 90vw;
-			padding: 0 3rem;
-		}
-
-		.main-content {
-			max-width: 90vw;
-			padding: 0 3rem;
-		}
-
-		.tabla-section {
-			padding: 4rem;
-		}
-
-		.app-header h1 {
-			font-size: 3.5rem;
-		}
-
-		.section-header h2 {
-			font-size: 2.5rem;
-		}
-
-		.department-info,
-		.admin-info {
-			font-size: 1.2rem;
-		}
 	}
 </style>

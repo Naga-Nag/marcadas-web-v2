@@ -6,12 +6,14 @@
      let password = '';
 
      async function handleLogin() {
+         console.log('LOGIN :: handleLogin: Starting login process for user', username);
          try {
              const { user, token } = await login(username, password);
+             console.log('LOGIN :: handleLogin: Login completed, redirecting to home');
              localStorage.setItem('token', token);
              goto('/');
          } catch (error) {
-             console.error('Error en el login:', error);
+             console.error('LOGIN :: handleLogin: Error in login process', error);
          }
      }
 </script>

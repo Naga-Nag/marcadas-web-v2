@@ -219,7 +219,7 @@
 		width: 100%;
 		max-width: 100%;
 		box-sizing: border-box;
-		overflow-x: hidden;
+		overflow-x: visible;
 	}
 
 	.botonera {
@@ -231,7 +231,6 @@
 		max-width: fit-content;
 		flex-wrap: nowrap;
 		justify-content: center;
-		margin: 0 auto 1.5rem auto;
 		padding: 1rem;
 		background: rgba(255, 255, 255, 0.05);
 		border-radius: 16px;
@@ -244,7 +243,7 @@
 		display: flex;
 		justify-content: center;
 		width: 100%;
-		margin-top: 18px;
+		margin-top: 0.5rem;
 		overflow-x: auto;
 	}
 
@@ -270,7 +269,6 @@
 		font-size: 0.95rem;
 		font-weight: 600;
 		box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-		margin: 0;
 		cursor: pointer;
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		position: relative;
@@ -310,7 +308,6 @@
 		background: #fff;
 		padding: 1em 2em;
 		border-radius: 8px;
-		margin-top: 2em;
 		font-size: 1.1em;
 		box-shadow: 0 2px 8px #1a6fc933;
 	}
@@ -399,44 +396,6 @@
 		.excel-btn {
 			width: 100%;
 			justify-content: center;
-		}
-	}
-
-	/* ===== OPTIMIZACIÓN PARA MONITORES GRANDES ===== */
-	@media (min-width: 1920px) {
-		.tabla-marcadas {
-			padding: 40px 20px 32px 20px;
-		}
-
-		.botonera {
-			gap: 1rem;
-			padding: 1.25rem;
-		}
-
-		.excel-btn {
-			font-size: 1rem;
-			padding: 0.875rem 1.5rem;
-		}
-	}
-
-	@media (min-width: 2560px) {
-		.tabla-marcadas {
-			padding: 48px 24px 40px 24px;
-		}
-
-		.botonera {
-			gap: 1.25rem;
-			padding: 1.5rem;
-		}
-
-		.excel-btn {
-			font-size: 1.1rem;
-			padding: 1rem 1.75rem;
-		}
-
-		.no-marcadas {
-			font-size: 1.3em;
-			padding: 1.5em 3em;
 		}
 	}
 </style>

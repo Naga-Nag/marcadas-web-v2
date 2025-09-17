@@ -20,14 +20,18 @@ export const handle = async ({ event, resolve }) => {
 
      // PROTEGER TODO LO DEMÁS
      const token = event.cookies.get('token');
+     console.log("HOOKS :: Checking authentication for path", event.url.pathname, { hasToken: !!token });
      if (!token) {
+          console.log("HOOKS :: No token found, redirecting to login");
           throw redirect(303, '/login');
      }
 
      let decodedUser: JwtPayload | null = null;
      try {
           decodedUser = jwt.verify(token, Bun.env.JWT_SECRET!) as JwtPayload;
+          console.log("HOOKS :: Token verified successfully", { username: decodedUser.username });
      } catch (err: any) {
+          console.log("HOOKS :: Token verification failed", { error: err?.name });
           event.cookies.delete('token', { path: '/', secure: false });
           clearUsuario();
           if (err?.name === 'TokenExpiredError') {
@@ -38,6 +42,7 @@ export const handle = async ({ event, resolve }) => {
 
      if (token && Bun.env.JWT_SECRET && decodedUser && typeof decodedUser !== 'string') {
           const user = await getUsuario(decodedUser.username);
+          console.log("HOOKS :: User fetched from database", { userFound: !!user });
           if (user) {
                event.locals.usuario = { ...user, ipaddr: event.getClientAddress ? event.getClientAddress() : null };
                console.log("HOOKS :: Usuario autenticado:", user);
@@ -48,6 +53,7 @@ export const handle = async ({ event, resolve }) => {
           }
           return resolve(event);
      } else {
+          console.log("HOOKS :: Authentication failed, redirecting to login");
           event.cookies.delete('token', { path: '/' });
           throw redirect(303, '/login');
      }

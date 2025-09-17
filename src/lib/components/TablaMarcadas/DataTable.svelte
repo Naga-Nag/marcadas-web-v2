@@ -10,7 +10,13 @@
 		type?: 'text' | 'checkbox'; // Optional type for cell content
 	};
 
-	let { columns, data, editable, onCellEdit, usuario }: {
+	let {
+		columns,
+		data,
+		editable,
+		onCellEdit,
+		usuario
+	}: {
 		columns: Array<columnsType>;
 		data: Array<Record<string, any>>;
 		editable: boolean;
@@ -75,14 +81,16 @@
 </script>
 
 <div class="table-controls">
-	<input type="text" placeholder="Filtrar..." bind:value={filter} class="filter-input" />
-	<button type="button" onclick={clearFiltersAndSorts} class="clear-btn">X</button>
+	<div class="search-bar">
+		<input type="text" placeholder="Filtrar..." bind:value={filter} class="filter-input" />
+		<button type="button" onclick={clearFiltersAndSorts} class="clear-btn">X</button>
+	</div>
+
 	{#if usuario.role === 'ADMIN'}
-		<button onclick={() => (editable = !editable)} style="font-size: 1.2em; margin-left: 10px;">
-		{editable ? '✅ Guardar' : '✏️ Editar'}
-	</button>
+		<button class="editar-button" onclick={() => (editable = !editable)}>
+			{editable ? '✅ Guardar' : '✏️ Editar'}
+		</button>
 	{/if}
-	
 </div>
 
 <div class="table-wrapper">
@@ -126,15 +134,23 @@
 </div>
 
 <style>
+	.editar-button {
+		outline: none;
+		border-radius: 6px;
+
+	}
+	.search-bar {
+		display: flex;
+		flex-wrap: nowrap;
+	}
 	.table-controls {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		padding: 1.25rem;
+		padding: 1rem;
 		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 		border-radius: 16px 16px 0 0;
-		border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-		backdrop-filter: blur(10px);
+		border-bottom: 1px solid rgba(226, 232, 240);
 		flex-wrap: wrap;
 	}
 
@@ -154,7 +170,9 @@
 	.filter-input:focus {
 		outline: none;
 		border-color: #667eea;
-		box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		box-shadow:
+			0 0 0 4px rgba(102, 126, 234, 0.1),
+			0 4px 6px -1px rgba(0, 0, 0, 0.1);
 		background: rgba(255, 255, 255, 1);
 	}
 
@@ -168,90 +186,55 @@
 		font-size: 0.9rem;
 		font-weight: 600;
 		cursor: pointer;
-		background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+		background: red;
 		color: white;
 		border: none;
 		border-radius: 12px;
 		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-		min-width: 44px;
-		min-height: 44px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		position: relative;
-		overflow: hidden;
 	}
-
-	.clear-btn::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: -100%;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-		transition: left 0.6s;
-	}
-
-	.clear-btn:hover::before {
-		left: 100%;
-	}
-
-	.clear-btn:hover {
-		background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-		transform: translateY(-1px);
-		box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
-	}
-
-	.clear-btn:active {
-		transform: translateY(0);
-		box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
-	}
-
+	
 	.table-wrapper {
+		position: relative;
 		width: 100%;
 		max-width: 100%;
 		max-height: 80vh;
-		overflow: hidden;
-		border-radius: 16px;
+		border-radius: 6px;
 		display: flex;
 		flex-direction: column;
-		box-shadow: 
+		box-shadow:
 			0 20px 25px -5px rgba(0, 0, 0, 0.1),
 			0 10px 10px -5px rgba(0, 0, 0, 0.04),
 			0 0 0 1px rgba(102, 126, 234, 0.05);
 		border: 1px solid rgba(226, 232, 240, 0.8);
-		margin-top: 0;
 		background: rgba(255, 255, 255, 0.95);
-		backdrop-filter: blur(20px);
 	}
 
 	.table-header {
 		display: flex;
+		position: relative;
 		width: 100%;
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		border: none;
 		outline: none;
-		position: sticky;
-		top: 0;
-		z-index: 10;
 	}
 
 	.table-body {
 		overflow-y: auto;
-		height: 500px;
 		width: 100%;
 		background: rgba(255, 255, 255, 0.95);
 	}
 
 	.row {
 		display: flex;
+		position: relative;
 		width: 100%;
 		border-bottom: 1px solid rgba(226, 232, 240, 0.5);
 		background: rgba(255, 255, 255, 0.8);
 		transition: all 0.2s ease;
-		position: relative;
 	}
 
 	.row:hover {
@@ -328,7 +311,7 @@
 		transform: translateY(0);
 	}
 
-	.header[aria-pressed="true"] {
+	.header[aria-pressed='true'] {
 		background: rgba(255, 255, 255, 0.15);
 		box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
@@ -353,7 +336,7 @@
 	}
 
 	/* Botón de edición mejorado */
-	button[onclick*="editable"] {
+	button[onclick*='editable'] {
 		background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 		color: white;
 		border: none;
@@ -372,7 +355,7 @@
 		gap: 0.5rem;
 	}
 
-	button[onclick*="editable"]::before {
+	button[onclick*='editable']::before {
 		content: '';
 		position: absolute;
 		top: 0;
@@ -383,17 +366,17 @@
 		transition: left 0.6s;
 	}
 
-	button[onclick*="editable"]:hover::before {
+	button[onclick*='editable']:hover::before {
 		left: 100%;
 	}
 
-	button[onclick*="editable"]:hover {
+	button[onclick*='editable']:hover {
 		background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
 		transform: translateY(-1px);
 		box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
 	}
 
-	button[onclick*="editable"]:active {
+	button[onclick*='editable']:active {
 		transform: translateY(0);
 		box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
 	}

@@ -230,7 +230,7 @@
 		top: calc(100% + 0.5rem);
 		left: 0;
 		right: 0;
-		background: rgba(255, 255, 255, 0.95);
+		background: rgba(255, 255, 255);
 		backdrop-filter: blur(20px);
 		border: 1px solid rgba(102, 126, 234, 0.2);
 		border-radius: 16px;
@@ -240,8 +240,7 @@
 			0 0 0 1px rgba(102, 126, 234, 0.05);
 		min-width: 280px;
 		z-index: 9999;
-		padding: 1.5rem;
-		opacity: 0;
+		padding: 1rem;
 		transform: translateY(-10px) scale(0.95);
 		animation: menuSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 	}
@@ -256,14 +255,6 @@
 			opacity: 1;
 			transform: translateY(0) scale(1);
 		}
-	}
-
-	.menu-section {
-		margin-bottom: 1.25rem;
-	}
-
-	.menu-section:last-child {
-		margin-bottom: 0;
 	}
 
 	.section-title {

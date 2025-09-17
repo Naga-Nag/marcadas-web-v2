@@ -7,6 +7,7 @@ import { clearUsuario } from "$lib/stores/usuario";
 
 
 export async function login(username: string, password: string) {
+    console.log('API :: login: Attempting login for user', username);
     const res = await fetch(`${API_USUARIOS}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -14,18 +15,23 @@ export async function login(username: string, password: string) {
     });
 
     const data = await res.json();
+    console.log('API :: login: Response received', { status: res.status, data });
     
     if (!res.ok) {
         notify({ title: 'Error de autenticación', message: data.error || 'Credenciales incorrectas', type: 'error', duration: 3000 });
         throw new Error(data.error || 'Error en autenticación');
     }
+    
+    console.log('API :: login: Login successful, setting user and token');
     notify({ title: 'Login exitoso', message: 'Bienvenido', type: 'success', duration: 3000 });
-    setUsuario(data.usuario); // <-- aca lo seteas en el globalStore
+    setUsuario(data.user); // <-- aca lo seteas en el globalStore
+    localStorage.setItem('token', data.token);
     window.location.href = '/';
     return data; // { user, token }
 }
 
 export async function logout() {
+    console.log('API :: logout: Initiating logout process');
     await fetch(`${API_USUARIOS}/logout`, {
         method: 'GET'
     });
