@@ -31,10 +31,9 @@
 	});
 </script>
 
+<div class="portal-host"></div>
 <div class="app-layout">
-	<div class="portal-host"></div>
 	<NotificationContainer />
-	
 	<div class="main-container">
 		{@render children()}
 	</div>
@@ -60,10 +59,10 @@
 		max-width: 100vw;
 		overflow-x: hidden;
 	}
-	
+
 	.portal-host {
 		position: absolute;
-		z-index: 101;
+		z-index: 10;
 		top: 0;
 		left: 0;
 		width: 100%;
@@ -74,11 +73,6 @@
 	/* ===== SCROLL BEHAVIOR ===== */
 	.main-container {
 		scroll-behavior: smooth;
-	}
-
-	/* ===== GLOBAL ANIMATIONS ===== */
-	.main-container > * {
-		animation: fadeInUp 0.5s ease-out;
 	}
 
 	@keyframes fadeInUp {

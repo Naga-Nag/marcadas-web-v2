@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { portal } from '$lib/portals';
 	import { onMount, onDestroy } from 'svelte';
 	let open = $state(false);
 	let selected = $state('delDia');
@@ -26,7 +27,22 @@
 	}
 
 	function updateMenuPosition() {
-		// Simple positioning - let CSS handle it
+		if (!menuElement) return;
+		
+		// Get the button element (parent of the dropdown)
+		const button = document.querySelector('.opciones-btn');
+		if (!button) return;
+		
+		// Get button position relative to viewport
+		const buttonRect = button.getBoundingClientRect();
+		
+		// Set the menu position
+		menuElement.style.position = 'absolute';
+		menuElement.style.top = `${buttonRect.bottom+20}px`;
+		menuElement.style.left = `${buttonRect.left}px`;
+		menuElement.style.minWidth = `${buttonRect.width}px`;
+		menuElement.style.zIndex = '1001';
+		menuElement.style.transform = 'none'; // Reset any transform that might interfere
 	}
 
 	function handleClickOutside(event: Event) {
@@ -71,6 +87,7 @@
 			}, 0);
 		}
 	});
+
 </script>
 
 <div class="opciones-dropdown" >
@@ -87,7 +104,7 @@
 		</svg>
 	</button>
 	{#if open}
-		<div class="opciones-menu" class:visible={open}>
+		<div class="opciones-menu" class:visible={open} use:portal bind:this={menuElement} style="opacity: {menuElement && open ? 1 : 0}; transition: opacity 0.2s;">
 			<div class="menu-section">
 				<h3 class="section-title">
 					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -145,13 +162,6 @@
 </div>
 
 <style>
-	.opciones-dropdown {
-		position: relative;
-		display: inline-block;
-		margin-bottom: 1em;
-		z-index: 9999;
-	}
-
 	.opciones-btn {
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		color: white;
@@ -164,7 +174,6 @@
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 		box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
 		position: relative;
 		overflow: hidden;
@@ -226,28 +235,24 @@
 	}
 
 	.opciones-menu {
-		position: absolute;
-		top: calc(100% + 0.5rem);
-		left: 0;
-		right: 0;
 		background: rgba(255, 255, 255);
-		backdrop-filter: blur(20px);
 		border: 1px solid rgba(102, 126, 234, 0.2);
 		border-radius: 16px;
-		box-shadow: 
+		box-shadow:
 			0 20px 25px -5px rgba(0, 0, 0, 0.1),
-			0 10px 10px -5px rgba(0, 0, 0, 0.04),
-			0 0 0 1px rgba(102, 126, 234, 0.05);
-		min-width: 280px;
-		z-index: 9999;
+			0 10px 10px -5px rgba(0, 0, 0.04),
+			0 0 1px rgba(102, 126, 234, 0.05);
 		padding: 1rem;
 		transform: translateY(-10px) scale(0.95);
 		animation: menuSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+		z-index: 1000;
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
 	}
 
 	.opciones-menu.visible {
 		opacity: 1;
-		transform: translateY(0) scale(1);
 	}
 
 	@keyframes menuSlideIn {

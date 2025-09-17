@@ -4,6 +4,7 @@
     import type { Departamento } from '$lib/types/gen';
     import { fade, slide } from 'svelte/transition';
 	import { browser } from '$app/environment';
+	import { portal } from '$lib/portals';
 
     let departamentos: Departamento[] = [];
     let showEditForm = false;
@@ -28,7 +29,8 @@
 
     });
 
-    function openEditForm(departamento: Departamento) {
+    function openEditForm(event: Event, departamento: Departamento) {
+        event.stopPropagation();
         form = { ...departamento };
         editingDeptid = departamento.Deptid;
         selloPreview = departamento.SelloJefe;
@@ -58,7 +60,8 @@
         }
     }
 
-    async function handleSubmit() {
+    async function handleSubmit(event: Event) {
+        event.preventDefault();
         loading = true;
         error = '';
         try {
@@ -98,7 +101,7 @@
                 <span class="dept-count">{departamentos.length} departamento{departamentos.length !== 1 ? 's' : ''}</span>
             </div>
             <button 
-                on:click={() => openEditForm({ Deptid: 0, DeptName: '', SelloJefe: null, leyendaJefe: '' })} 
+                onclick={(e) => openEditForm(e, { Deptid: 0, DeptName: '', SelloJefe: null, leyendaJefe: '' })} 
                 class="btn primary-btn action-btn"
             >
                 <span>+ Nuevo Departamento</span>
@@ -106,18 +109,18 @@
         </div>
 
         {#if showEditForm}
-            <div class="register-form-overlay" transition:fade>
+            <div class="register-form-overlay" transition:fade use:portal>
                 <div class="register-form">
                     <header class="form-header">
                         <h3>{editingDeptid ? 'Editar Departamento' : 'Nuevo Departamento'}</h3>
-                        <button on:click={closeForm} class="close-button" aria-label="Cerrar">&times;</button>
+                        <button onclick={closeForm} class="close-button" aria-label="Cerrar">&times;</button>
                     </header>
                     
                     {#if error}
                         <div class="error" role="alert">{error}</div>
                     {/if}
                     
-                    <form on:submit|preventDefault={handleSubmit} class="dept-form">
+                    <form onsubmit={handleSubmit} class="dept-form">
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="deptName">
@@ -127,7 +130,7 @@
                                         type="text" 
                                         bind:value={form.DeptName} 
                                         required 
-                                        placeholder="Ej: Recursos Humanos"
+                                        placeholder="Ej: Seguridad e Higiene"
                                     />
                                 </label>
                             </div>
@@ -139,7 +142,7 @@
                                         id="leyendaJefe"
                                         type="text" 
                                         bind:value={form.leyendaJefe} 
-                                        placeholder="Ej: Director de Departamento"
+                                        placeholder="Ej: Jefe de Departamento"
                                     />
                                 </label>
                             </div>
@@ -152,7 +155,7 @@
                                     id="selloJefe"
                                     type="file" 
                                     accept="image/*" 
-                                    on:change={handleFileChange}
+                                    onchange={handleFileChange}
                                     class="file-input"
                                 />
                                 <div class="file-input-help">
@@ -175,7 +178,7 @@
                             <button class="btn primary-btn" type="submit" disabled={loading} class:loading>
                                 {editingDeptid ? 'Actualizar' : 'Crear'}
                             </button>
-                            <button type="button" class="btn secondary-btn" on:click={closeForm}>
+                            <button type="button" class="btn secondary-btn" onclick={closeForm}>
                                 Cancelar
                             </button>
                         </div>
@@ -202,7 +205,7 @@
                                     <div class="dept-actions">
                                         <button 
                                             class="btn secondary-btn" 
-                                            on:click|stopPropagation={() => openEditForm(departamento)}
+                                            onclick={(e) => openEditForm(e, departamento)}
                                             aria-label="Editar departamento {departamento.DeptName}"
                                         >
                                             Editar
@@ -247,6 +250,12 @@
 </main>
 
 <style>
+
+.register-form-overlay {
+    position: absolute;
+
+}
+
 /* ===== ADMIN HEADER ===== */
 .admin-header {
     background: rgba(255, 255, 255, 0.05);
@@ -510,64 +519,6 @@
     background: rgba(25, 118, 210, 0.05);
     border-radius: 8px;
     margin-top: 0.5rem;
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 768px) {
-    .section-header {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: center;
-    }
-
-    .section-title {
-        justify-content: center;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .dept-summary {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
-    }
-
-    .dept-info {
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .dept-actions {
-        justify-content: center;
-    }
-
-    .details-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .departments-section {
-        padding: 1rem;
-    }
-
-    .seal-image {
-        max-width: 120px;
-        max-height: 120px;
-    }
-}
-
-@media (max-width: 480px) {
-    .dept-info {
-        flex-direction: column;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .seal-image {
-        max-width: 100px;
-        max-height: 100px;
-    }
 }
 
 /* ===== ACCESSIBILITY IMPROVEMENTS ===== */

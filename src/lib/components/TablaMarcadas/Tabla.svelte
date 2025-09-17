@@ -231,12 +231,13 @@
 		max-width: fit-content;
 		flex-wrap: nowrap;
 		justify-content: center;
-		padding: 1rem;
-		background: rgba(255, 255, 255, 0.05);
+		padding: 0.5rem;
+		background: rgba(255, 255, 255);
 		border-radius: 16px;
-		backdrop-filter: blur(10px);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		z-index: 10;
+		position: relative;
 	}
 
 	.grid-container {
@@ -245,6 +246,8 @@
 		width: 100%;
 		margin-top: 0.5rem;
 		overflow-x: auto;
+		z-index: 1;
+		position: relative;
 	}
 
 	.grid {
