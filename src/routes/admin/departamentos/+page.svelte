@@ -82,8 +82,8 @@
 
 <header class="admin-header">
     <nav class="breadcrumb">
-        <a href="/admin/usuarios" class="btn primary-btn breadcrumb-link">
-            <span>← Volver a Usuarios</span>
+        <a href="/" class="btn primary-btn breadcrumb-link">
+            <span>← Volver a Inicio</span>
         </a>
     </nav>
     

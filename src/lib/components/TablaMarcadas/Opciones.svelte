@@ -91,7 +91,11 @@
 </script>
 
 <div class="opciones-dropdown" >
-	<button class="opciones-btn" onclick={(e) => { e.stopPropagation(); ignoreClickOutside = true; open = !open; }} aria-label="Abrir opciones" aria-expanded={open}>
+	<button class="opciones-btn" onclick={(e) => {
+			e.stopPropagation();
+			ignoreClickOutside = true;
+			open = !open;
+		}} aria-label="Abrir opciones" aria-expanded={open}>
 		<div class="icon-container" class:rotating={open}>
 			<svg class="cog-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -119,19 +123,20 @@
 				</h3>
 				<div class="radio-group">
 					{#each opciones as opcion}
-						<label class="radio-label" class:selected={selected === opcion.value}>
-							<div class="radio-custom">
-								<input
-									type="radio"
-									name="tipo-marcada"
-									value={opcion.value}
-									checked={selected === opcion.value}
-									onchange={() => selectOpcion(opcion.value)}
-								/>
-								<div class="radio-indicator"></div>
-							</div>
-							<span class="radio-text">{opcion.label}</span>
-						</label>
+											<label class="radio-label" class:selected={selected === opcion.value}>
+												<div class="radio-custom">
+													<input
+														type="radio"
+														name="tipo-marcada"
+														value={opcion.value}
+														checked={selected === opcion.value}
+														onchange={() => selectOpcion(opcion.value)}
+														onclick={(e) => e.stopPropagation()}
+													/>
+													<div class="radio-indicator"></div>
+												</div>
+												<span class="radio-text">{opcion.label}</span>
+											</label>
 					{/each}
 				</div>
 			</div>
@@ -144,17 +149,17 @@
 					Filtros
 				</h3>
 				<div class="checkbox-group">
-					<label class="checkbox-label" class:checked={ocultarInactivos}>
-						<div class="checkbox-custom">
-							<input type="checkbox" bind:checked={ocultarInactivos} onchange={toggleInactivos} />
-							<div class="checkbox-indicator">
-								<svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-									<path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-								</svg>
-							</div>
-						</div>
-						<span class="checkbox-text">Ocultar personal inactivo</span>
-					</label>
+									<label class="checkbox-label" class:checked={ocultarInactivos}>
+										<div class="checkbox-custom">
+											<input type="checkbox" bind:checked={ocultarInactivos} onchange={toggleInactivos} onclick={(e) => e.stopPropagation()} />
+											<div class="checkbox-indicator">
+												<svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+													<path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+												</svg>
+											</div>
+										</div>
+										<span class="checkbox-text">Ocultar personal inactivo</span>
+									</label>
 				</div>
 			</div>
 		</div>
@@ -249,6 +254,7 @@
 		position: absolute;
 		top: -9999px;
 		left: -9999px;
+		pointer-events: auto; /* Fix for click-through issue */
 	}
 
 	.opciones-menu.visible {

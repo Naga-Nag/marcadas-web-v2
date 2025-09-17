@@ -148,6 +148,12 @@ h2 {
 .primary-btn {
      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
      color: #fff;
+     border: none;
+     outline: none;
+     padding: 1rem;
+     border-radius: 6px;
+     transition: all 0.3s ease;
+     
 }
 
 .primary-btn:hover {

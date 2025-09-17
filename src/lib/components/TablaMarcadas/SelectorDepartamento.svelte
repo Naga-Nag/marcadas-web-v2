@@ -35,16 +35,14 @@
 
 <style>
 	.selector-departamento {
-		overflow-x: scroll; /* Force scrollbar to always appear */
+		display: flex;
+		overflow-x: scroll;
 		padding: 0.5rem;
 		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 		border-radius: 6px;
 		border: 1px solid rgba(226, 232, 240, 0.8);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 		width: 100%;
-		/* Use white-space approach instead of flexbox */
-		white-space: nowrap;
-		/* Add standard scrollbar properties */
 		scrollbar-width: thin;
 		scrollbar-color: #667eea #e2e8f0;
 	}
@@ -73,7 +71,9 @@
 		overflow: hidden;
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 		min-width: fit-content;
-	
+		padding: 0.5rem;
+		margin-right: 1rem;
+		
 	}
 
 	button:hover::before {

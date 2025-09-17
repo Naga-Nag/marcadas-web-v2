@@ -22,8 +22,15 @@
 	/** Tipos */
 	import type { Departamento, Marcada, shortUsuario } from '$lib/types/gen';
 
-	let { selectedDepartamento, departamentos = [], usuario }:
-	 { selectedDepartamento: Departamento | null, departamentos: Departamento[], usuario: shortUsuario } = $props();
+	let {
+		selectedDepartamento,
+		departamentos = [],
+		usuario
+	}: {
+		selectedDepartamento: Departamento | null;
+		departamentos: Departamento[];
+		usuario: shortUsuario;
+	} = $props();
 
 	/** Variables */
 	let selectedOpcion = $state('estandar');
@@ -40,7 +47,6 @@
 
 	type Column = {
 		id: string;
-		width: number;
 		header: string;
 		footer: string;
 		type?: 'text' | 'checkbox'; // <-- Añade esto
@@ -51,23 +57,28 @@
 	$effect(() => {
 		if (selectedOpcion === 'estandar') {
 			columns = [
-				{ id: 'Personal.MR', width: 50, header: 'MR', footer: 'MR', type: 'text' },
-				{ id: 'Personal.CUIL', width: 100, header: 'CUIL', footer: 'CUIL', type: 'text' },
-				{ id: 'Personal.Nombre', width: 240, header: 'Nombre', footer: 'Nombre', type: 'text' },
-				{ id: 'Personal.Departamento', width: 80, header: 'Depto', footer: 'Departamento', type: 'text' },
-				{ id: 'Salida', width: 120, header: 'Salida', footer: 'Salida', type: 'text' },
-				{ id: 'Entrada', width: 120, header: 'Entrada', footer: 'Entrada', type: 'text' },
-				{ id: 'Estado', width: 120, header: 'Estado', footer: 'Estado', type: 'text' },
-				{ id: 'Personal.Activo', width: 80, header: 'Activo', footer: 'Activo', type: 'checkbox' } // <-- Aquí
+				{ id: 'Personal.MR', header: 'MR', footer: 'MR', type: 'text' },
+				{ id: 'Personal.CUIL', header: 'CUIL', footer: 'CUIL', type: 'text' },
+				{ id: 'Personal.Nombre', header: 'Nombre', footer: 'Nombre', type: 'text' },
+				{ id: 'Personal.Departamento', header: 'Depto', footer: 'Departamento', type: 'text' },
+				{ id: 'Salida', header: 'Salida', footer: 'Salida', type: 'text' },
+				{ id: 'Entrada', header: 'Entrada', footer: 'Entrada', type: 'text' },
+				{ id: 'Estado', header: 'Estado', footer: 'Estado', type: 'text' },
+				{ id: 'Personal.Activo', header: 'Activo', footer: 'Activo', type: 'checkbox' } // <-- Aquí
 			];
 		} else {
 			columns = [
-				{ id: 'Personal.MR', width: 80, header: 'MR', footer: 'MR', type: 'text' },
-				{ id: 'Personal.CUIL', width: 100, header: 'CUIL', footer: 'CUIL', type: 'text' },
-				{ id: 'Personal.Nombre', width: 180, header: 'Nombre', footer: 'Nombre', type: 'text' },
-				{ id: 'Marcada', width: 120, header: 'Marcada', footer: 'Marcada', type: 'text' },
-				{ id: 'Personal.Departamento', width: 140, header: 'Departamento', footer: 'Departamento', type: 'text' },
-				{ id: 'Personal.Activo', width: 80, header: 'Activo', footer: 'Activo', type: 'checkbox' }
+				{ id: 'Personal.MR', header: 'MR', footer: 'MR', type: 'text' },
+				{ id: 'Personal.CUIL', header: 'CUIL', footer: 'CUIL', type: 'text' },
+				{ id: 'Personal.Nombre', header: 'Nombre', footer: 'Nombre', type: 'text' },
+				{ id: 'Marcada', header: 'Marcada', footer: 'Marcada', type: 'text' },
+				{
+					id: 'Personal.Departamento',
+					header: 'Departamento',
+					footer: 'Departamento',
+					type: 'text'
+				},
+				{ id: 'Personal.Activo', header: 'Activo', footer: 'Activo', type: 'checkbox' }
 			];
 		}
 	});
@@ -78,7 +89,14 @@
 				console.warn('Departamento o fecha no seleccionados');
 				return;
 			}
-			console.log('Sincronizando marcadas para:', selectedDepartamento!.DeptName, 'en fecha:', fecha, 'con opción:', selectedOpcion);
+			console.log(
+				'Sincronizando marcadas para:',
+				selectedDepartamento!.DeptName,
+				'en fecha:',
+				fecha,
+				'con opción:',
+				selectedOpcion
+			);
 			marcadas = await fetchMarcadas(selectedDepartamento!.DeptName, fecha, selectedOpcion);
 		} catch (error) {
 			console.error('Error al sincronizar marcadas:', error);
@@ -89,7 +107,6 @@
 		if (selectedDepartamento && fecha) {
 			syncMarcadas();
 		}
-
 	});
 
 	onMount(async () => {
@@ -109,7 +126,7 @@
 	});
 
 	function handleCellEdit(uid: number, colId: string, newValue: string) {
-		const row = marcadas.find(m => m.Personal.UID === uid);
+		const row = marcadas.find((m) => m.Personal.UID === uid);
 		if (!row) return;
 
 		// Actualiza el dato localmente (soporta campos anidados tipo "Personal.CUIL")
@@ -126,15 +143,17 @@
 			updatePersonal({ UID: row.Personal.UID, Activo: newValue });
 		}
 		// Lógica condicional según la columna editada
-		else if (colId.startsWith("Personal.")) {
-			console.log(`Actualizando ${colId} de ${row.Personal.Nombre} (${row.Personal.MR}) a ${newValue}`);
+		else if (colId.startsWith('Personal.')) {
+			console.log(
+				`Actualizando ${colId} de ${row.Personal.Nombre} (${row.Personal.MR}) a ${newValue}`
+			);
 			updatePersonal({ UID: row.Personal.UID, [colId]: newValue });
-		}
-		else {
-			console.log(`No Actualizando ${colId} de ${row.Personal.Nombre} (${row.Personal.MR}) a ${newValue}`);
+		} else {
+			console.log(
+				`No Actualizando ${colId} de ${row.Personal.Nombre} (${row.Personal.MR}) a ${newValue}`
+			);
 			// Aquí podrías agregar lógica para otras columnas si es necesario
 		}
-
 	}
 </script>
 
@@ -143,9 +162,10 @@
 		{departamentos}
 		selected={selectedDepartamento}
 		onSelect={(depa) => {
-			selectedDepartamento = typeof depa === 'string'
-				? departamentos.find(d => d.DeptName === depa) ?? selectedDepartamento
-				: depa;
+			selectedDepartamento =
+				typeof depa === 'string'
+					? (departamentos.find((d) => d.DeptName === depa) ?? selectedDepartamento)
+					: depa;
 			syncMarcadas();
 		}}
 	/>
@@ -169,7 +189,8 @@
 				</button>
 			{/if}
 			{#if selectedDepartamento.DeptName === 'ARPB'}
-				<button class="excel-btn animate-pop"
+				<button
+					class="excel-btn animate-pop"
 					onclick={() => {
 						const ausentes = filtrarAusentes(marcadas);
 						const ausentesActivos = filtrarPersonalActivo(ausentes);
@@ -195,7 +216,7 @@
 						data={ocultarInactivos ? filtrarPersonalActivo(marcadas) : marcadas}
 						{columns}
 						onCellEdit={handleCellEdit}
-						usuario={usuario}
+						{usuario}
 					/>
 				</div>
 			{:else}
@@ -216,48 +237,43 @@
 		flex-direction: column;
 		align-items: center;
 		padding: 32px 12px 24px 12px;
-		width: 100%;
-		max-width: 100%;
 		box-sizing: border-box;
 		overflow-x: visible;
+		background-color: #fff;
+		border-radius: 6px;
 	}
 
 	.botonera {
 		display: flex;
+		position: relative;
 		flex-direction: row;
-		align-items: center;
-		gap: 0.75rem;
-		width: 100%;
-		max-width: fit-content;
 		flex-wrap: nowrap;
-		justify-content: center;
+		align-self: flex-start;
+		gap: 0.75rem;
 		padding: 0.5rem;
 		background: rgba(255, 255, 255);
 		border-radius: 16px;
 		border: 1px solid rgba(255, 255, 255, 0.1);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-		z-index: 10;
-		position: relative;
 	}
 
 	.grid-container {
 		display: flex;
+		position: relative;
 		justify-content: center;
 		width: 100%;
 		margin-top: 0.5rem;
 		overflow-x: auto;
 		z-index: 1;
-		position: relative;
 	}
 
 	.grid {
-		width: 100%;
-		max-width: 100%;
 		background: rgba(255, 255, 255, 0.97);
 		border-radius: 16px;
 		box-shadow: 0 6px 32px 0 #1a6fc933;
 		padding: 0 0 12px 0;
 		animation: fadein 0.7s;
+		width: 100%;
 	}
 
 	.excel-btn {
@@ -285,7 +301,6 @@
 		position: absolute;
 		top: 0;
 		left: -100%;
-		width: 100%;
 		height: 100%;
 		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
 		transition: left 0.6s;
@@ -353,52 +368,6 @@
 		to {
 			opacity: 1;
 			transform: translateX(0);
-		}
-	}
-
-	/* Responsive */
-	@media (max-width: 900px) {
-		.tabla-marcadas {
-			padding: 16px 8px;
-		}
-
-		.botonera {
-			flex-wrap: wrap;
-			max-width: 100%;
-			gap: 0.5rem;
-			padding: 0.75rem;
-		}
-
-		.grid {
-			max-width: 100%;
-			border-radius: 8px;
-		}
-
-		.excel-btn {
-			font-size: 0.9rem;
-			padding: 0.625rem 1rem;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.tabla-marcadas {
-			padding: 12px 4px;
-		}
-
-		.botonera {
-			flex-direction: column;
-			gap: 0.75rem;
-			align-items: stretch;
-			padding: 1rem;
-		}
-
-		.grid {
-			border-radius: 4px;
-		}
-
-		.excel-btn {
-			width: 100%;
-			justify-content: center;
 		}
 	}
 </style>

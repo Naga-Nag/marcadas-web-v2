@@ -6,7 +6,6 @@
 	type columnsType = {
 		id: string;
 		header: string;
-		width?: number;
 		type?: 'text' | 'checkbox'; // Optional type for cell content
 	};
 
@@ -87,7 +86,7 @@
 	</div>
 
 	{#if usuario.role === 'ADMIN'}
-		<button class="editar-button" onclick={() => (editable = !editable)}>
+		<button class="editar-button primary-btn" onclick={() => (editable = !editable)}>
 			{editable ? '✅ Guardar' : '✏️ Editar'}
 		</button>
 	{/if}
@@ -99,7 +98,6 @@
 			<button
 				type="button"
 				class="cell header"
-				style="width: {col.width ? col.width + 'px' : 'auto'}"
 				onclick={() => setSort(col.id)}
 				aria-pressed={sortColumn === col.id}
 				tabindex="0"
@@ -117,7 +115,7 @@
 				{#snippet item({ index, style })}
 					<div class="row" {style}>
 						{#each columns as col}
-							<div class="cell" style="width: {col.width ? col.width + 'px' : 'auto'}">
+							<div class="cell">
 								<EditableCell
 									{editable}
 									value={getValue(derivedData[index], col.id)}
@@ -134,11 +132,6 @@
 </div>
 
 <style>
-	.editar-button {
-		outline: none;
-		border-radius: 6px;
-
-	}
 	.search-bar {
 		display: flex;
 		flex-wrap: nowrap;
@@ -147,7 +140,7 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		padding: 1rem;
+		padding: 0.5rem;
 		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 		border-radius: 16px 16px 0 0;
 		border-bottom: 1px solid rgba(226, 232, 240);
@@ -155,7 +148,6 @@
 	}
 
 	.filter-input {
-		padding: 0.75rem 1rem;
 		font-size: 0.95rem;
 		min-width: 240px;
 		border: 2px solid #e2e8f0;
@@ -201,7 +193,6 @@
 		position: relative;
 		width: 100%;
 		max-width: 100%;
-		max-height: 80vh;
 		border-radius: 6px;
 		display: flex;
 		flex-direction: column;
