@@ -84,8 +84,6 @@
 <main class="main-content">
 	<div class="tabla-container">
 		<Tabla
-			{selectedDepartamento}
-			departamentos={departamentosPermitidos}
 			usuario={resto.data.usuario}
 		/>
 	</div>

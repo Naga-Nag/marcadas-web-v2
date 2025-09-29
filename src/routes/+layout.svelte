@@ -4,6 +4,7 @@
 	import { createPortal } from '$lib/portals';
 	import { onDestroy, onMount } from 'svelte';
 	import NotificationContainer from '$lib/components/Notification/NotificationContainer.svelte';
+	import { setUsuario } from '$lib/stores/usuario';
 
 	let { children, ...resto } = $props();
 
@@ -17,6 +18,8 @@
 		}
 		if (resto.data.usuario) {
 			console.log(resto.data.usuario);
+			// Set the user in the client-side store
+			setUsuario(resto.data.usuario);
 		}
 	});
 

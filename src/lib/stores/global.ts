@@ -1,11 +1,13 @@
-import type { Marcada } from '$lib/types/gen';
+import type { Marcada, Departamento } from '$lib/types/gen';
 import { writable, derived} from 'svelte/store';
 
 export const globalStore = writable({
      loading: false,
      fechaMarcada: '',
      searchText: '',
-     marcadas: [] as Marcada[]
+     marcadas: [] as Marcada[],
+     departamentos: [] as Departamento[],
+     selectedDepartamento: null as Departamento | null
 });
 
 export const ausentes = derived(globalStore, ($store) => {
@@ -33,6 +35,24 @@ export function setSearchText(text: string) {
           store.searchText = text;
           return store;
      });
+}
+
+export function setDepartamentos(departamentos: Departamento[]) {
+     globalStore.update((state) => ({ ...state, departamentos: departamentos }));
+}
+
+export function setSelectedDepartamento(departamento: Departamento | null) {
+     globalStore.update((state) => ({ ...state, selectedDepartamento: departamento }));
+}
+
+export function getSelectedDepartamento() {
+     let selected: Departamento | null = null;
+     globalStore.subscribe(state => selected = state.selectedDepartamento)();
+     return selected;
+}
+
+export function clearSelectedDepartamento() {
+     globalStore.update((state) => ({ ...state, selectedDepartamento: null }));
 }
 
 export function setLoading(loading: boolean) {

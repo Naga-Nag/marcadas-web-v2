@@ -1,32 +1,67 @@
 <script lang="ts">
-	import type { Departamento } from "$lib/types/gen";
+	import type { Departamento } from '$lib/types/gen';
+	import { globalStore, setDepartamentos, setSelectedDepartamento } from '$lib/stores/global';
+	import { usuarioStore } from '$lib/stores/usuario';
+	import { onDestroy } from 'svelte';
 
-	let {
-		departamentos = [],
-		selected = null,
-		onSelect = () => {}
-	}: {
-		departamentos: Departamento[];
-		selected: Departamento | null;
-		onSelect: (depa: string) => void;
-	} = $props();
+	let allDepartamentos = $state<Departamento[]>([]);
+	let selected = $state<Departamento | null>(null);
+	let currentUser = $state<shortUsuario | null>(null);
 
-	if (departamentos && departamentos.length > 0) {
-		const idx = departamentos.findIndex(d => d.DeptName === 'ARPB');
-		if (idx > 0) {
-			const arpb = departamentos[idx];
-			departamentos = [arpb, ...departamentos.slice(0, idx), ...departamentos.slice(idx + 1)];
+	let unsubscribeGlobal = globalStore.subscribe((state) => {
+		allDepartamentos = state.departamentos;
+		selected = state.selectedDepartamento;
+	});
+
+	let unsubscribeUsuario = usuarioStore.subscribe((user) => {
+		currentUser = user;
+	});
+
+	onDestroy(() => {
+		unsubscribeGlobal();
+		unsubscribeUsuario();
+	});
+
+	// Compute filtered departments based on user role and permissions
+	let departamentos = $derived(() => {
+	let filteredDepartamentos;
+		
+		// If user data is available and user has USER role with permissions, filter departments
+		if (currentUser && currentUser.role === 'USER' && currentUser.departamentosPermitidos) {
+			// Filter departments to only show allowed ones for USER role (case-insensitive comparison with trimming)
+			filteredDepartamentos = allDepartamentos.filter((depa) => {
+				return currentUser.departamentosPermitidos?.some(
+					(permiso) => permiso.trim().toLowerCase() === depa.DeptName.trim().toLowerCase()
+				);
+			});
+		} else {
+			// For non-USER roles or when user data is not yet available, show all departments
+			filteredDepartamentos = allDepartamentos;
 		}
-	}
+		
+		// Move ARPB department to the beginning when it exists
+		if (filteredDepartamentos && filteredDepartamentos.length > 0) {
+			const idx = filteredDepartamentos.findIndex((d) => d.DeptName.trim().toLowerCase() === 'arpb');
+			if (idx > 0) {
+				const arpb = filteredDepartamentos[idx];
+				return [
+					arpb,
+					...filteredDepartamentos.slice(0, idx),
+					...filteredDepartamentos.slice(idx + 1)
+				];
+			}
+		}
+		
+		return filteredDepartamentos;
+	});
 </script>
 
 <div class="selector-departamento">
-	{#if departamentos.length === 0}
+	{#if departamentos().length === 0}
 		<p>No hay departamentos disponibles</p>
-
 	{:else}
-		{#each departamentos as depa}
-			<button class:selected={selected === depa} onclick={() => onSelect(depa.DeptName)}>
+		{#each departamentos() as depa}
+			<button class:selected={selected === depa} onclick={() => setSelectedDepartamento(depa)}>
 				{depa.DeptName}
 			</button>
 		{/each}
@@ -73,7 +108,6 @@
 		min-width: fit-content;
 		padding: 0.5rem;
 		margin-right: 1rem;
-		
 	}
 
 	button:hover::before {
@@ -113,13 +147,13 @@
 
 	button:focus {
 		outline: none;
-		box-shadow: 
+		box-shadow:
 			0 6px 20px rgba(102, 126, 234, 0.15),
 			0 0 0 3px rgba(102, 126, 234, 0.2);
 	}
 
 	button.selected:focus {
-		box-shadow: 
+		box-shadow:
 			0 6px 20px rgba(102, 126, 234, 0.25),
 			0 0 0 3px rgba(102, 126, 234, 0.3);
 	}

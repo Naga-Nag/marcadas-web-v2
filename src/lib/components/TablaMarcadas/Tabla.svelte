@@ -10,7 +10,7 @@
 	import { updatePersonal } from '$lib/apiController/personal';
 	import { downloadExcel } from '$lib/utils/genExcel';
 	/** Stores*/
-	import { globalStore, isLoading } from '$lib/stores/global';
+	import { globalStore, isLoading, setSelectedDepartamento, getSelectedDepartamento } from '$lib/stores/global';
 
 	/** Componentes */
 	import Loading from '$lib/components/Loading.svelte';
@@ -23,12 +23,8 @@
 	import type { Departamento, Marcada, shortUsuario } from '$lib/types/gen';
 
 	let {
-		selectedDepartamento,
-		departamentos = [],
 		usuario
 	}: {
-		selectedDepartamento: Departamento | null;
-		departamentos: Departamento[];
 		usuario: shortUsuario;
 	} = $props();
 
@@ -39,11 +35,16 @@
 	let loading = $state(true);
 	let ocultarInactivos = $state(true);
 	let editable = $state(false); // o true si quieres que sea editable por defecto
-	console.log('selectedDepartamento', selectedDepartamento);
+	let departamentos = $state<Departamento[]>([]);
+	let selectedDepartamento = $state<Departamento | null>(null);
+	
 	globalStore.subscribe((state) => {
 		marcadas = state.marcadas;
 		loading = state.loading;
+		departamentos = state.departamentos;
+		selectedDepartamento = state.selectedDepartamento;
 	});
+	
 
 	type Column = {
 		id: string;
@@ -120,6 +121,14 @@
 			hoy.setDate(hoy.getDate() - 2);
 			fecha = hoy.toISOString().split('T')[0];
 		}
+		
+		// Fetch departamentos if not already loaded
+		if (departamentos.length === 0) {
+			const fetchedDepartamentos = await fetchDepartamentos();
+			// Set departamentos in the global store
+			globalStore.update(state => ({ ...state, departamentos: fetchedDepartamentos }));
+		}
+		
 		if (selectedDepartamento && marcadas.length === 0) {
 			await syncMarcadas();
 		}
@@ -158,17 +167,7 @@
 </script>
 
 <div class="tabla-marcadas animate-fadein">
-	<SelectorDepartamento
-		{departamentos}
-		selected={selectedDepartamento}
-		onSelect={(depa) => {
-			selectedDepartamento =
-				typeof depa === 'string'
-					? (departamentos.find((d) => d.DeptName === depa) ?? selectedDepartamento)
-					: depa;
-			syncMarcadas();
-		}}
-	/>
+	<SelectorDepartamento />
 
 	{#if selectedDepartamento}
 		<div class="botonera">
