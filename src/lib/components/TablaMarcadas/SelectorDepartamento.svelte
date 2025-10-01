@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Departamento } from '$lib/types/gen';
+	import type { Departamento, shortUsuario } from '$lib/types/gen';
 	import { globalStore, setDepartamentos, setSelectedDepartamento } from '$lib/stores/global';
 	import { usuarioStore } from '$lib/stores/usuario';
 	import { onDestroy } from 'svelte';
@@ -61,7 +61,7 @@
 		<p>No hay departamentos disponibles</p>
 	{:else}
 		{#each departamentos() as depa}
-			<button class:selected={selected === depa} onclick={() => setSelectedDepartamento(depa)}>
+			<button class:selected={selected?.Deptid === depa.Deptid} onclick={() => setSelectedDepartamento(depa)}>
 				{depa.DeptName}
 			</button>
 		{/each}

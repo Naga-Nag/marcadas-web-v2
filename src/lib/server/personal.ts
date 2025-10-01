@@ -130,7 +130,9 @@ export async function updatePersonal(personal: Partial<Personal>): Promise<void>
             setFields.push("Deptid = @deptid");
         }
         if (flatPersonal.Activo !== undefined) {
-            request.input("activo", sql.Bit, flatPersonal.Activo);
+            // Convert string values to boolean for SQL bit type
+            const activoValue = flatPersonal.Activo === 'true' || flatPersonal.Activo === '1' || flatPersonal.Activo === true || flatPersonal.Activo === 1;
+            request.input("activo", sql.Bit, activoValue);
             setFields.push("Activo = @activo");
         }
         if (flatPersonal.CUIL !== undefined) {

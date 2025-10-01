@@ -1,5 +1,5 @@
 CREATE OR ALTER FUNCTION MarcadasDelDia(@Departamento NVARCHAR(50), @Fecha DATE) 
-RETURNS @Resultado TABLE 
+RETURNS @Resultado TABLE
 (
      LID INT,
      UID INT,
@@ -27,9 +27,9 @@ BEGIN
      FROM
           dbo.Userinfo ui
      INNER JOIN dbo.Dept d ON ui.Deptid = d.Deptid
-     LEFT JOIN dbo.Checkinout ci 
+     LEFT JOIN dbo.Checkinout ci
           ON ui.Userid = ci.Userid
-          AND CAST(ci.CheckTime AS DATE) = @Fecha -- <--- filtro de fecha aquí
+          AND CAST(ci.CheckTime AS DATE) = @Fecha -- <--- filtro de fecha aca
      WHERE (@Departamento = 'ARPB' OR d.DeptName = @Departamento)
      RETURN
 END

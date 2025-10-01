@@ -6,104 +6,103 @@ import sql from "mssql";
 
 // Utilidad para transformar un row plano a { Personal, ... }
 function rowToMarcada(row: any): Marcada {
-    // Si ya viene con Personal, no lo toques
-    if (row.Personal) return row as Marcada;
-    const personal: Personal = {
-        UID: row.UID,
-        MR: row.MR,
-        Nombre: row.Nombre,
-        Departamento: row.Departamento,
-        CUIL: row.CUIL,
-        Jornada: row.Jornada,
-        Activo: row.Activo,
-        Foto: row.Foto ?? ''
-    };
-    return {
-        LID: row.LID,
-        Personal: personal,
-        Marcada: row.Marcada ?? null,
-        Entrada: row.Entrada ?? null,
-        Salida: row.Salida ?? null,
-        Estado: row.Estado ?? null
-    };
+  // Si ya viene con Personal, no lo toques
+  if (row.Personal) return row as Marcada;
+  const personal: Personal = {
+    UID: row.UID,
+    MR: row.MR,
+    Nombre: row.Nombre,
+    Departamento: row.Departamento,
+    CUIL: row.CUIL,
+    Jornada: row.Jornada,
+    Activo: row.Activo,
+    Foto: row.Foto ?? ''
+  };
+  return {
+    LID: row.LID,
+    Personal: personal,
+    Marcada: row.Marcada ?? null,
+    Entrada: row.Entrada ?? null,
+    Salida: row.Salida ?? null,
+    Estado: row.Estado ?? null
+  };
 }
 
 function parseFechaMarcada(fecha: string): Date {
-    if (!fecha) return new Date(''); // fallback
-    // "29/05/2025 06:29"
-    const [d, m, rest] = fecha.split('/');
-    if (!rest) return new Date('');
-    const [y, time] = rest.split(' ');
-    return new Date(`${y}-${m}-${d}T${time || '00:00'}:00`);
+  if (!fecha) return new Date(''); // fallback
+  // "29/05/2025 06:29"
+  const [d, m, rest] = fecha.split('/');
+  if (!rest) return new Date('');
+  const [y, time] = rest.split(' ');
+  return new Date(`${y}-${m}-${d}T${time || '00:00'}:00`);
 }
 
 
 
 export async function getMarcadasDelDia(
-    departamento: string,
-    fecha: string
+  departamento: string,
+  fecha: string
 ): Promise<Array<Marcada>> {
-    let startTime = new Date();
-    await connection?.connect();
+  let startTime = new Date();
+  await connection?.connect();
 
-    return new Promise(async (resolve, reject) => {
-        const rows: Array<Marcada> = [];
-        const request = new sql.Request();
+  return new Promise(async (resolve, reject) => {
+    const rows: Array<Marcada> = [];
+    const request = new sql.Request();
 
-        const query = `USE ${Bun.env.DB}; SELECT * FROM MarcadasDelDia('${departamento}', '${fecha}');`;
+    const query = `USE ${Bun.env.DB}; SELECT * FROM MarcadasDelDia('${departamento}', '${fecha}');`;
 
-        request.query(query);
+    request.query(query);
 
-        request.on('row', (row) => {
-            processRow(row);
-            rows.push(rowToMarcada(row));
-        });
-
-        request.on('error', (err) => {
-            console.error('Error fetching data:', err);
-            reject(err);
-        });
-
-        request.on('done', () => {
-            let endTime = new Date();
-            console.log("INFO db :: " + 'Tiempo de consulta MarcadaDelDia:', differenceInMilliseconds(endTime, startTime) + 'ms');
-            console.log("INFO db :: " + rows.length + " registros encontrados");
-            resolve(rows);
-        });
+    request.on('row', (row) => {
+      processRow(row);
+      rows.push(rowToMarcada(row));
     });
+
+    request.on('error', (err) => {
+      console.error('Error fetching data:', err);
+      reject(err);
+    });
+
+    request.on('done', () => {
+      let endTime = new Date();
+      console.log("INFO db :: Marcada del dia :: Departamento " + departamento + " :: " + rows.length + " registros encontrados en " + differenceInMilliseconds(endTime, startTime) + 'ms');
+      resolve(rows);
+    });
+  });
 }
 
 export async function getMarcadasEntreFechas(departamento: string, fechaInicial: string, fechaFinal: string): Promise<Array<Marcada>> {
-    let startTime = new Date();
-    await connection?.connect();
+  let startTime = new Date();
+  await connection?.connect();
 
-    return new Promise((resolve, reject) => {
-        const rows: Array<Marcada> = [];
-        const request = new sql.Request();
-        request.stream = true;
+  return new Promise((resolve, reject) => {
+    const rows: Array<Marcada> = [];
+    const request = new sql.Request();
+    request.stream = true;
 
-        const query = `USE ${Bun.env.DB}; SELECT * FROM MarcadaEntreFechas('${departamento}', '${fechaInicial}', '${fechaFinal}');`;
+    const query = `USE ${Bun.env.DB}; SELECT * FROM MarcadaEntreFechas('${departamento}', '${fechaInicial}', '${fechaFinal}');`;
 
-        console.log('Query fetchMarcadaEntreFechas:', query);
-        request.query(query);
+    console.log('Query fetchMarcadaEntreFechas:', query);
+    request.query(query);
 
-        request.on('row', (row) => {
-            processRow(row);
-            rows.push(rowToMarcada(row));
-        });
-
-        request.on('error', (err) => {
-            console.error('Error fetching data:', err);
-            reject(err);
-        });
-
-        request.on('done', () => {
-            let endTime = new Date();
-            console.log("INFO db :: " + 'Tiempo de consulta MarcadaEntreFechas:', differenceInMilliseconds(endTime, startTime) + 'ms');
-            console.log("INFO db :: " + rows.length + " registros encontrados");
-            resolve(rows);
-        });
+    request.on('row', (row) => {
+      processRow(row);
+      rows.push(rowToMarcada(row));
     });
+
+    request.on('error', (err) => {
+      console.error('Error fetching data:', err);
+      reject(err);
+    });
+
+    request.on('done', () => {
+      let endTime = new Date();
+      console.log("INFO db :: " + 'Tiempo de consulta MarcadaEntreFechas:', differenceInMilliseconds(endTime, startTime) + 'ms');
+      console.log("INFO db :: " + rows.length + " registros encontrados");
+      resolve(rows);
+    });
+  });
 }
 
 export async function getMarcadasEstandar(departamento: string, fecha: string): Promise<Array<Marcada>> {

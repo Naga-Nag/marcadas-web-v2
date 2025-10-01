@@ -156,7 +156,8 @@
 			console.log(
 				`Actualizando ${colId} de ${row.Personal.Nombre} (${row.Personal.MR}) a ${newValue}`
 			);
-			updatePersonal({ UID: row.Personal.UID, [colId]: newValue });
+			const fieldName = colId.split('.')[1]; // Extract field name after "Personal."
+			updatePersonal({ UID: row.Personal.UID, [fieldName]: newValue });
 		} else {
 			console.log(
 				`No Actualizando ${colId} de ${row.Personal.Nombre} (${row.Personal.MR}) a ${newValue}`

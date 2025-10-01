@@ -26,8 +26,8 @@
     {#if type === 'checkbox'}
         <input
             type="checkbox"
-            checked={value}
-            on:change={(e) => onEdit(e.target && (e.target as HTMLInputElement).checked ? 1 : 0)}
+            checked={value == 1 || value === true || value === '1' || value === 'true'}
+            on:change={(e) => onEdit(e.target && (e.target as HTMLInputElement).checked ? 'true' : 'false')}
         />
     {:else}
         {#if !isEditing}

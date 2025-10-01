@@ -19,7 +19,7 @@
 		columns: Array<columnsType>;
 		data: Array<Record<string, any>>;
 		editable: boolean;
-		onCellEdit?: (rowIndex: number, colId: string, newValue: string) => void;
+		onCellEdit?: (uid: number, colId: string, newValue: string) => void;
 		usuario: shortUsuario;
 	} = $props();
 
@@ -120,7 +120,11 @@
 									{editable}
 									value={getValue(derivedData[index], col.id)}
 									type={col.type}
-									onEdit={(newValue) => onCellEdit && onCellEdit(index, col.id, newValue)}
+									onEdit={(newValue) => {
+										const row = derivedData[index];
+										const uid = getValue(row, 'Personal.UID');
+										onCellEdit && onCellEdit(uid, col.id, newValue);
+									}}
 								/>
 							</div>
 						{/each}
