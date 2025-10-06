@@ -197,7 +197,7 @@
 						if (!ausentes || ausentes.length === 0) {
 							alert('No hay ausentes para exportar a Excel.');
 						} else {
-							downloadExcel(ausentesActivos, 'ausentes');
+							downloadExcel(ausentesActivos, 'ausentes', false, true);
 						}
 					}}
 				>

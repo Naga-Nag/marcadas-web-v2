@@ -1,7 +1,7 @@
 import type { Marcada } from '$lib/types/gen';
 import ExcelJS from 'exceljs';
 
-export async function downloadExcel(data: Array<Marcada>, fileName = 'marcada', marcadasIntermedias = false) {
+export async function downloadExcel(data: Array<Marcada>, fileName = 'marcada', marcadasIntermedias = false, includeDeptName = false) {
   if (!Array.isArray(data) || data.length === 0) {
     console.warn("No hay datos para exportar a Excel");
     return;
@@ -15,6 +15,7 @@ export async function downloadExcel(data: Array<Marcada>, fileName = 'marcada', 
     { header: 'M.R', key: 'MR', width: 10 },
     { header: 'CUIL', key: 'CUIL', width: 15 },
     { header: 'Nombre', key: 'Nombre', width: 25 },
+    includeDeptName && { header: 'Departamento', key: 'Departamento', width: 15 },
     { header: 'CAUSA', key: 'CAUSA', width: 15 },
     { header: 'COD AUS', key: 'COD_AUS', width: 10 },
     { header: 'Horas', key: 'Horas', width: 10 },
@@ -33,6 +34,7 @@ export async function downloadExcel(data: Array<Marcada>, fileName = 'marcada', 
       MR: row.Personal.MR,
       CUIL: row.Personal.CUIL,
       Nombre: row.Personal.Nombre,
+      Departamento: includeDeptName ? row.Personal.Departamento : undefined,
       CAUSA: '',
       COD_AUS: '',
       Horas: '',

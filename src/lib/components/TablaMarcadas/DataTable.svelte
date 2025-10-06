@@ -239,16 +239,13 @@
 	}
 
 	.cell {
-		flex: 1 1 0;
-		min-width: 0;
+		display: flex;
+		flex: 1 0 0;
 		padding: 0.875rem 1rem;
-		box-sizing: border-box;
 		white-space: nowrap;
 		overflow: hidden;
-		text-overflow: ellipsis;
 		font-size: 0.95rem;
 		font-weight: 500;
-		letter-spacing: 0.025em;
 		border-right: 1px solid rgba(226, 232, 240, 0.5);
 		background: transparent;
 		color: #374151;
@@ -275,26 +272,10 @@
 		border: none;
 		color: white;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
 		font-size: 0.875rem;
 		transition: all 0.2s ease;
 		position: relative;
 		overflow: hidden;
-	}
-
-	.header::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: -100%;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-		transition: left 0.6s;
-	}
-
-	.header:hover::before {
-		left: 100%;
 	}
 
 	.header:hover {
