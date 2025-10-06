@@ -31,13 +31,13 @@
         />
     {:else}
         {#if !isEditing}
-            <button type="button" on:click={startEdit} class="editable-cell-button">
+            <span on:click={startEdit} class="editable-cell-button">
                 {#if value === null || value === undefined}
                     <span class="placeholder">Editar</span>
                 {:else}
                     {value}
                 {/if}
-            </button>
+            </span>
         {:else}
             <input
                 type="text"
@@ -63,60 +63,23 @@
         border: none;
         color: inherit;
         cursor: pointer;
-        padding: 0.5rem;
         font: inherit;
+        font-size: inherit;
+		font-weight: inherit;
         text-decoration: none;
-        border-radius: 8px;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         width: 100%;
         text-align: left;
-        overflow: hidden;
-    }
 
-    .editable-cell-button:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-    }
-
-    .editable-cell-button:hover {
-        background: rgba(102, 126, 234, 0.08);
-        color: #4c51bf;
-        transform: scale(1.02);
-    }
-
-    .editable-cell-button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
-        transition: left 0.5s;
-    }
-
-    .editable-cell-button:hover::before {
-        left: 100%;
     }
 
     .editable-cell-input {
         width: 100%;
-        padding: 0.5rem 0.75rem;
-        border: 2px solid #e2e8f0;
-        border-radius: 8px;
         font-size: 0.95rem;
         background: rgba(255, 255, 255, 0.95);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         color: #374151;
         font-weight: 500;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .editable-cell-input:focus {
-        border-color: #667eea;
-        outline: none;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        background: rgba(255, 255, 255, 1);
     }
 
     .placeholder {
