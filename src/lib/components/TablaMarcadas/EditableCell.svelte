@@ -31,13 +31,13 @@
         />
     {:else}
         {#if !isEditing}
-            <span on:click={startEdit} class="editable-cell-button">
+            <button on:click={startEdit} class="editable-cell-button" on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && startEdit()}>
                 {#if value === null || value === undefined}
                     <span class="placeholder">Editar</span>
                 {:else}
                     {value}
                 {/if}
-            </span>
+            </button>
         {:else}
             <input
                 type="text"

@@ -179,9 +179,11 @@ export async function updateDepartamento(depto: Partial<Departamento>) {
       request.input('deptName', sql.NVarChar, depto.DeptName);
     }
     if (depto.SelloJefe !== undefined) {
-      let bufferValue = depto.SelloJefe;
-      if (typeof bufferValue === 'string') {
-        bufferValue = Buffer.from(bufferValue, 'base64');
+      let bufferValue: Buffer | null = null;
+      if (typeof depto.SelloJefe === 'string') {
+        bufferValue = Buffer.from(depto.SelloJefe, 'base64');
+      } else if (Buffer.isBuffer(depto.SelloJefe)) {
+        bufferValue = depto.SelloJefe;
       }
       setClauses.push('selloJefe = @selloJefe');
       request.input('selloJefe', sql.Image, bufferValue);

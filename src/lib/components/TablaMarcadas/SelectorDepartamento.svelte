@@ -28,15 +28,15 @@
 		
 		// If user data is available and user has USER role with permissions, filter departments
 		if (currentUser && currentUser.role === 'USER' && currentUser.departamentosPermitidos) {
-			// Filter departments to only show allowed ones for USER role (case-insensitive comparison with trimming)
-			filteredDepartamentos = allDepartamentos.filter((depa) => {
-				return currentUser.departamentosPermitidos?.some(
-					(permiso) => permiso.trim().toLowerCase() === depa.DeptName.trim().toLowerCase()
-				);
-			});
+		  // Filter departments to only show allowed ones for USER role (case-insensitive comparison with trimming)
+		  filteredDepartamentos = allDepartamentos.filter((depa) => {
+		    return currentUser?.departamentosPermitidos && currentUser.departamentosPermitidos.some(
+		      (permiso) => permiso.trim().toLowerCase() === depa.DeptName.trim().toLowerCase()
+		    );
+		  });
 		} else {
-			// For non-USER roles or when user data is not yet available, show all departments
-			filteredDepartamentos = allDepartamentos;
+		  // For non-USER roles or when user data is not yet available, show all departments
+		  filteredDepartamentos = allDepartamentos;
 		}
 		
 		// Move ARPB department to the beginning when it exists
