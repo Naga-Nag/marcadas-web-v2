@@ -9,24 +9,63 @@ export const usuariosRouter = router({
  // Login procedure - public
   login: publicProcedure
     .input(loginUsuarioSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       try {
         const result = await loginWebUser(input.username, input.password);
         if ('error' in result) {
-          throw new TRPCError({ 
-            code: 'UNAUTHORIZED', 
-            message: result.error 
+          throw new TRPCError({
+            code: 'UNAUTHORIZED',
+            message: result.error
           });
         }
-        return result;
+        
+        const { WebUser, token } = result;
+        
+        // Set the token as a cookie
+        const cookieOptions = {
+          path: '/',
+          httpOnly: true,
+          sameSite: 'lax' as const,
+          secure: Bun.env.BUILD === 'production',
+          maxAge: 60 * 60 * 8 // 8 horas
+        };
+        
+        ctx.event.cookies.set('token', token, cookieOptions);
+        
+        // Return user data without password
+        const { password: _, ...usuario } = WebUser;
+        return { user: usuario, token };
       } catch (error) {
         if (error instanceof TRPCError) {
           throw error;
         }
         console.error('Error during login:', error);
-        throw new TRPCError({ 
-          code: 'INTERNAL_SERVER_ERROR', 
-          message: 'Login failed' 
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Login failed'
+        });
+      }
+    }),
+
+  // Logout procedure - public
+  logout: publicProcedure
+    .mutation(async ({ ctx }) => {
+      try {
+        // Clear the token cookie
+        ctx.event.cookies.delete('token', {
+          path: '/',
+          secure: Bun.env.BUILD === 'production'
+        });
+        
+        return {
+          success: true,
+          message: 'Logout exitoso'
+        };
+      } catch (error) {
+        console.error('Error during logout:', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Logout failed'
         });
       }
     }),

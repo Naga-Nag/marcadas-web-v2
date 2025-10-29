@@ -1,19 +1,42 @@
 <script>
-	import { goto } from '$app/navigation';
-	import { login } from '$lib/apiController/usuarioApi';
+	import { trpc } from '$lib/trpc/client';
+	import { browser } from '$app/environment';
 
-	let username = '';
-	let password = '';
+	let username = $state('');
+	let password = $state('');
+	let isLoading = $state(false);
 
 	async function handleLogin() {
+		if (!browser) return;
+		
 		console.log('LOGIN :: handleLogin: Starting login process for user', username);
+		isLoading = true;
+		
 		try {
-			const { user, token } = await login(username, password);
+			const response = await fetch('/api/usuario/login', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ username, password })
+			});
+			
+			const data = await response.json();
+			
+			if (!response.ok) {
+				console.error('LOGIN :: handleLogin: Login failed', data);
+				// In a real app, you might want to show an error notification here
+				return;
+			}
+			
 			console.log('LOGIN :: handleLogin: Login completed, redirecting to home');
-			localStorage.setItem('token', token);
-			goto('/');
+			// Use a full page redirect to ensure proper authentication context
+			window.location.href = '/';
 		} catch (error) {
 			console.error('LOGIN :: handleLogin: Error in login process', error);
+			// In a real app, you might want to show an error notification here
+		} finally {
+			isLoading = false;
 		}
 	}
 </script>
@@ -36,7 +59,9 @@
 					autocomplete="current-password"
 				/>
 			</div>
-			<button type="submit" class="login-btn">Iniciar Sesión</button>
+			<button type="submit" class="login-btn" disabled={isLoading}>
+				{isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+			</button>
 		</form>
 	</div>
 </div>

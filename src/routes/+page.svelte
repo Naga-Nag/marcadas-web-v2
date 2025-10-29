@@ -1,11 +1,10 @@
 <script lang="ts">
 	import Tabla from '$lib/components/TablaMarcadas/Tabla.svelte';
-	import { logout } from '$lib/apiController/usuarioApi';
-	import { fetchDepartamentos } from '$lib/apiController/departamentosApi';
-	import { fetchDepartamentoByName } from '$lib/apiController/departamentosApi';
-	import { onMount } from 'svelte';
-	import type { Departamento } from '$lib/types/gen';
 	import { browser } from '$app/environment';
+	import { trpc } from '$lib/trpc/client';
+	import type { Departamento } from '$lib/types/gen';
+	import { invalidateAll } from '$app/navigation';
+	import { onMount } from 'svelte';
 	let { ...resto } = $props();
 
 	let selectedDepartamento = $state<Departamento | null>(null);
@@ -19,11 +18,18 @@
 	);
 
 	onMount(async () => {
-		if (resto.data.usuario?.role === 'ADMIN') {
-			departamentosPermitidos = await fetchDepartamentos();
-		} else {
-			selectedDepartamento = await fetchDepartamentoByName(resto.data.usuario?.departamento);
-			console.log('selectedDepartamento', selectedDepartamento);
+		// Only proceed if we have a valid user from the server-side load
+		if (resto.data.usuario && resto.data.usuario.username) {
+			if (resto.data.usuario?.role === 'ADMIN') {
+				const result = await trpc.departamentos.getAll.query();
+				departamentosPermitidos = result;
+			} else {
+				const result = await trpc.departamentos.getByName.query({
+					DeptName: resto.data.usuario?.departamento
+				});
+				selectedDepartamento = result;
+				console.log('selectedDepartamento', selectedDepartamento);
+			}
 		}
 		if (browser) {
 			const body = document.querySelector('body');
@@ -32,6 +38,25 @@
 			}
 		}
 	});
+
+	async function handleLogout() {
+		if (!browser) return;
+
+		// Clear the token cookie by calling the logout endpoint
+		await fetch('/api/usuario/logout', {
+			method: 'GET'
+		});
+
+		// Clear local storage
+		localStorage.removeItem('token');
+
+		// Clear any user data from stores
+		// Note: We're not using the API controller logout function anymore
+
+		// Hard redirect to clear all state and reload fresh session
+		await invalidateAll();
+		window.location.href = '/login';
+	}
 </script>
 
 <header class="app-header">
@@ -43,7 +68,7 @@
 				<button
 					class="logout-btn"
 					onclick={async () => {
-						await logout();
+						await handleLogout();
 					}}
 					aria-label="Cerrar sesión"
 				>
@@ -83,9 +108,7 @@
 
 <main class="main-content">
 	<div class="tabla-container">
-		<Tabla
-			usuario={resto.data.usuario}
-		/>
+		<Tabla usuario={resto.data.usuario} />
 	</div>
 </main>
 

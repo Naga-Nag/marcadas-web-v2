@@ -1,5 +1,5 @@
 import { createTRPCClient, httpBatchLink, TRPCClientError } from '@trpc/client';
-import type { AppRouter } from './router';
+import type { AppRouter } from '$lib/server/trpc/router';
 import superjson from 'superjson';
 import { browser } from '$app/environment';
 
@@ -19,8 +19,25 @@ export const trpc = createTRPCClient<AppRouter>({
       url: '/api/trpc',
       transformer: superjson,
       fetch: async (input, init) => {
+        // Ensure credentials are included to send cookies with requests
+        const fetchInit = {
+          ...init,
+          credentials: 'include' as const
+        };
+        
+        // Add a small delay to allow authentication context to be established
+        // This helps with timing issues when requests are made immediately after login
+        if (browser) {
+          // Check if this is not a login/logout request
+          const url = input.toString();
+          if (!url.includes('usuarios.login') && !url.includes('usuarios.logout')) {
+            // Add a small delay to ensure authentication context is ready
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
+        
         try {
-          const response = await fetch(input, init);
+          const response = await fetch(input, fetchInit);
           
           // Handle authentication errors globally
           if (response.status === 401 && browser) {
@@ -28,7 +45,7 @@ export const trpc = createTRPCClient<AppRouter>({
             
             // Don't trigger session expired for login/logout calls
             const url = input.toString();
-            if (!url.includes('auth.login') && !url.includes('auth.logout')) {
+            if (!url.includes('usuarios.login') && !url.includes('usuarios.logout')) {
               if (sessionExpiredHandler) {
                 sessionExpiredHandler();
               }

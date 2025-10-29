@@ -9,22 +9,41 @@ const rutasPublicas = ['/login', '/api/usuario/login'];
 await iniciarServidor();
 
 export const handle = async ({ event, resolve }) => {
-     if (Bun.env.JWT_SECRET === undefined) {
-          console.error("HOOKS :: JWT_SECRET no definido en el entorno.");
-          throw error(500, 'Error interno del servidor: JWT_SECRET no definido.');
-     }
-     // Permitir rutas públicas sin autenticación
-     if (rutasPublicas.includes(event.url.pathname)) {
-          return resolve(event);
-     }
+      if (Bun.env.JWT_SECRET === undefined) {
+           console.error("HOOKS :: JWT_SECRET no definido en el entorno.");
+           throw error(500, 'Error interno del servidor: JWT_SECRET no definido.');
+      }
+      // Permitir rutas públicas sin autenticación
+      if (rutasPublicas.some(route => event.url.pathname.startsWith(route))) {
+           console.log("HOOKS :: Allowing public route:", event.url.pathname);
+           return resolve(event);
+      }
 
-     // PROTEGER TODO LO DEMÁS
-     const token = event.cookies.get('token');
-     console.log("HOOKS :: Checking authentication for path", event.url.pathname, { hasToken: !!token });
-     if (!token) {
-          console.log("HOOKS :: No token found, redirecting to login");
-          throw redirect(303, '/login');
-     }
+      // For tRPC routes, we need to check authentication but don't redirect
+      if (event.url.pathname.startsWith('/api/trpc/')) {
+           // Check for JWT token in cookies for tRPC requests
+           const token = event.cookies.get('token');
+           if (token && Bun.env.JWT_SECRET) {
+                try {
+                     const decodedUser = jwt.verify(token, Bun.env.JWT_SECRET!) as JwtPayload;
+                     const user = await getUsuario(decodedUser.username);
+                     if (user) {
+                          event.locals.usuario = { ...user, ipaddr: event.getClientAddress ? event.getClientAddress() : null };
+                     }
+                } catch (err) {
+                     console.log("HOOKS :: Token verification failed for tRPC request", { error: (err as Error)?.name });
+                }
+           }
+           return resolve(event);
+      }
+
+      // PROTEGER TODO LO DEMÁS
+      const token = event.cookies.get('token');
+      console.log("HOOKS :: Checking authentication for path", event.url.pathname, { hasToken: !!token });
+      if (!token) {
+           console.log("HOOKS :: No token found, redirecting to login");
+           throw redirect(303, '/login');
+      }
 
      let decodedUser: JwtPayload | null = null;
      try {

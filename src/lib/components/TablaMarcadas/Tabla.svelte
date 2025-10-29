@@ -1,13 +1,13 @@
 <script lang="ts">
 	/** Svelte */
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
 	/** API */
-	import { fetchMarcadas } from '$lib/apiController/marcadasApi';
-	import { fetchDepartamentos } from '$lib/apiController/departamentosApi';
+	import { trpc } from '$lib/trpc/client';
 	import { generateExcelFromTemplate } from '$lib/utils/genParteClientSide';
 	import { filtrarAusentes, filtrarPersonalActivo } from '$lib/utils';
-	import { updatePersonal } from '$lib/apiController/personal';
+	// Removed import for updatePersonal as we're using tRPC directly now
 	import { downloadExcel } from '$lib/utils/genExcel';
 	/** Stores*/
 	import { globalStore, isLoading, setSelectedDepartamento, getSelectedDepartamento } from '$lib/stores/global';
@@ -85,11 +85,11 @@
 	});
 
 	async function syncMarcadas() {
+	if (!selectedDepartamento || !fecha) {
+			console.warn('Departamento o fecha no seleccionados');
+			return;
+		}
 		try {
-			if (!selectedDepartamento || !fecha) {
-				console.warn('Departamento o fecha no seleccionados');
-				return;
-			}
 			console.log(
 				'Sincronizando marcadas para:',
 				selectedDepartamento!.DeptName,
@@ -98,7 +98,11 @@
 				'con opción:',
 				selectedOpcion
 			);
-			marcadas = await fetchMarcadas(selectedDepartamento!.DeptName, fecha, selectedOpcion);
+			marcadas = await trpc.marcadas.getMarcadas.query({
+				departamento: selectedDepartamento!.DeptName,
+				fecha,
+				funcion: selectedOpcion === 'estandar' ? 'estandar' : 'delDia'
+			});
 		} catch (error) {
 			console.error('Error al sincronizar marcadas:', error);
 		}
@@ -122,11 +126,15 @@
 			fecha = hoy.toISOString().split('T')[0];
 		}
 		
-		// Fetch departamentos if not already loaded
-		if (departamentos.length === 0) {
-			const fetchedDepartamentos = await fetchDepartamentos();
-			// Set departamentos in the global store
-			globalStore.update(state => ({ ...state, departamentos: fetchedDepartamentos }));
+		// Fetch departamentos if not already loaded and we have a valid user
+		if (departamentos.length === 0 && usuario && usuario.username) {
+			try {
+				const fetchedDepartamentos = await trpc.departamentos.getAll.query();
+				// Set departamentos in the global store
+				globalStore.update(state => ({ ...state, departamentos: fetchedDepartamentos }));
+			} catch (error) {
+				console.error('Error fetching departamentos:', error);
+			}
 		}
 		
 		if (selectedDepartamento && marcadas.length === 0) {
@@ -135,7 +143,7 @@
 	});
 
 	function handleCellEdit(uid: number, colId: string, newValue: string) {
-		const row = marcadas.find((m) => m.Personal.UID === uid);
+	const row = marcadas.find((m) => m.Personal.UID === uid);
 		if (!row) return;
 
 		// Actualiza el dato localmente (soporta campos anidados tipo "Personal.CUIL")
@@ -147,9 +155,9 @@
 		obj[path[path.length - 1]] = newValue;
 
 		console.log(`Editando columna ${colId}, nuevo valor: ${newValue}`);
-		if (colId === 'Personal.Activo') {
+	if (colId === 'Personal.Activo') {
 			// Actualiza el estado del usuario si es el campo "Activo"
-			updatePersonal({ UID: row.Personal.UID, Activo: newValue });
+			handleUpdatePersonal({ UID: row.Personal.UID, Activo: newValue });
 		}
 		// Lógica condicional según la columna editada
 		else if (colId.startsWith('Personal.')) {
@@ -157,12 +165,23 @@
 				`Actualizando ${colId} de ${row.Personal.Nombre} (${row.Personal.MR}) a ${newValue}`
 			);
 			const fieldName = colId.split('.')[1]; // Extract field name after "Personal."
-			updatePersonal({ UID: row.Personal.UID, [fieldName]: newValue });
+			handleUpdatePersonal({ UID: row.Personal.UID, [fieldName]: newValue });
 		} else {
 			console.log(
 				`No Actualizando ${colId} de ${row.Personal.Nombre} (${row.Personal.MR}) a ${newValue}`
 			);
 			// Aquí podrías agregar lógica para otras columnas si es necesario
+		}
+	}
+
+	async function handleUpdatePersonal(personal: Partial<Personal>) {
+		if (!browser) return;
+	try {
+			await trpc.personal.update.mutate(personal);
+			// Optionally show a success notification here
+		} catch (error) {
+			console.error('Error updating personal:', error);
+			// Optionally show an error notification here
 		}
 	}
 </script>
@@ -177,7 +196,7 @@
 			{#if fecha}
 				<button
 					class="excel-btn animate-pop"
-					onclick={() => generateExcelFromTemplate(selectedDepartamento!.DeptName, fecha)}
+					onclick={() => generateExcelFromTemplate(selectedDepartamento!.DeptName, fecha, trpc)}
 				>
 					<svg width="20" height="20" fill="none" viewBox="0 0 24 24"
 						><path

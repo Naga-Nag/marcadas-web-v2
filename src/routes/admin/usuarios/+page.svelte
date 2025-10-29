@@ -1,39 +1,53 @@
 <script lang="ts">
-	import { fetchUsuarios, createUsuario, updateUsuario, deleteUsuario } from '$lib/apiController/usuarioApi';
-	import { fetchDepartamentos } from '$lib/apiController/departamentosApi';
+	import { trpc } from '$lib/trpc/client';
+	import { browser } from '$app/environment';
 	import type { Departamento, shortUsuario } from '$lib/types/gen';
 	import { onMount } from 'svelte';
 	import { fade, slide } from 'svelte/transition';
 	import Tag from '$lib/components/Tag.svelte';
 
-	let usuarios: shortUsuario[] = [];
-	let departamentos: Departamento[] = [];
-	let showRegisterForm = false;
-	let error = '';
-	let loading = false;
+	let usuarios: shortUsuario[] = $state([]);
+	let departamentos: Departamento[] = $state([]);
+	let showRegisterForm = $state(false);
+	let error = $state('');
+	let loading = $state(false);
 
 	// Formulario de registro/edición
 	type UsuarioForm = Partial<shortUsuario> & { password?: string };
-	let form: UsuarioForm = {
+	let form: UsuarioForm = $state({
 		username: '',
 		password: '',
 		role: 'USER',
 		departamento: '',
 		departamentosPermitidos: []
-	};
-	let editingUser: string | null = null;
+	});
+	let editingUser: string | null = $state(null);
 
 	async function loadUsuarios() {
-		usuarios = await fetchUsuarios();
+		if (!browser) return;
+	try {
+			const result = await trpc.usuarios.getAll.query();
+			usuarios = result;
+		} catch (e: any) {
+			console.error('Error fetching usuarios:', e);
+			error = e.message || 'Error al cargar usuarios';
+		}
 	}
 
 	async function loadDepartamentos() {
-		departamentos = await fetchDepartamentos();
+	if (!browser) return;
+		try {
+			const result = await trpc.departamentos.getAll.query();
+			departamentos = result;
+		} catch (e: any) {
+			console.error('Error fetching departamentos:', e);
+			error = e.message || 'Error al cargar departamentos';
+		}
 	}
 
 	onMount(async () => {
 		await loadUsuarios();
-		await loadDepartamentos();
+	await loadDepartamentos();
 	});
 
 	function openRegisterForm() {
@@ -43,7 +57,7 @@
 			role: 'USER',
 			departamento: '',
 			departamentosPermitidos: []
-		};
+	};
 		editingUser = null;
 		showRegisterForm = true;
 	}
@@ -63,57 +77,88 @@
 	}
 
 	function closeForm() {
-		showRegisterForm = false;
+	showRegisterForm = false;
 		form = {
 			username: '',
 			password: '',
 			role: 'USER',
 			departamento: '',
 			departamentosPermitidos: []
-		};
+	};
 		editingUser = null;
-		error = '';
+	error = '';
 	}
 
 	async function handleSubmit() {
+		if (!browser) return;
+		
 		loading = true;
 		error = '';
-		try {
+	try {
 			if (!form.username || !form.role || !form.departamento) {
 				error = 'Completa todos los campos obligatorios';
 				loading = false;
 				return;
 			}
 			if (editingUser) {
-				await updateUsuario(form);
+				await trpc.usuarios.update.mutate({
+					username: form.username!,
+					role: form.role,
+					departamento: form.departamento,
+					departamentosPermitidos: form.departamentosPermitidos
+				});
 			} else {
-				await createUsuario(form as any);
+				await trpc.usuarios.create.mutate({
+					username: form.username!,
+					password: form.password!,
+					role: form.role,
+					departamento: form.departamento,
+					departamentosPermitidos: form.departamentosPermitidos
+				});
 			}
 			await loadUsuarios();
 			closeForm();
 		} catch (e: any) {
+			console.error('Error saving usuario:', e);
 			error = e.message || 'Error al guardar usuario';
 		}
 		loading = false;
 	}
 
 	async function handleDepartamentoToggle(dep: string) {
+		if (!browser) return;
+		
 		if (!form.departamentosPermitidos) form.departamentosPermitidos = [];
 		if (form.departamentosPermitidos.includes(dep)) {
 			form.departamentosPermitidos = form.departamentosPermitidos.filter((d) => d !== dep);
 		} else {
 			form.departamentosPermitidos = [...form.departamentosPermitidos, dep];
 		}
-		// Si está editando, actualiza en backend
-		if (editingUser) {
+	// Si está editando, actualiza en backend
+	if (editingUser) {
 			try {
-				await updateUsuario({
+				await trpc.usuarios.update.mutate({
 					username: form.username,
 					departamentosPermitidos: form.departamentosPermitidos
 				});
 				await loadUsuarios();
 			} catch (e: any) {
+				console.error('Error updating departamentos permitidos:', e);
 				error = e.message || 'Error actualizando departamentos permitidos';
+			}
+		}
+	}
+
+	async function handleDeleteUsuario(username: string) {
+		if (!browser) return;
+		
+		if (confirm(`¿Estás seguro de que deseas eliminar al usuario ${username}?`)) {
+			try {
+				await trpc.usuarios.delete.mutate({ username });
+				await loadUsuarios();
+			} catch (e: any) {
+				console.error('Error deleting usuario:', e);
+				error = e.message || 'Error al eliminar usuario';
 			}
 		}
 	}
@@ -261,9 +306,9 @@
 										>
 											Editar
 										</button>
-										<button 
-											class="btn danger-btn" 
-											on:click|stopPropagation={() => deleteUsuario(usuario.username)}
+										<button
+											class="btn danger-btn"
+											on:click|stopPropagation={() => handleDeleteUsuario(usuario.username)}
 											aria-label="Eliminar usuario {usuario.username}"
 										>
 											Eliminar

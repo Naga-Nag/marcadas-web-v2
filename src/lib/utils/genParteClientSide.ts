@@ -1,21 +1,25 @@
 import type { Marcada } from '$lib/types/gen';
-import { fetchMarcadas } from '$lib/apiController/marcadasApi';
-import { fetchDepartamentos } from '$lib/apiController/departamentosApi'; // <-- Import this
 import { filtrarPersonalActivo } from '$lib/utils';
 import ExcelJS from 'exceljs';
 import { Buffer } from 'buffer';
+import type { AppRouter } from '$lib/server/trpc/router';
+import type { TRPCClient } from '@trpc/client';
 
 
-export async function generateExcelFromTemplate(departamento: string, fecha: string): Promise<void> {
+export async function generateExcelFromTemplate(departamento: string, fecha: string, trpcClient: any): Promise<void> {
      console.time('generateExcelFromTemplate');
-     let marcadas: Marcada[] = await fetchMarcadas(departamento, fecha, 'estandar');
+     let marcadas: Marcada[] = await trpcClient.marcadas.getMarcadas.query({
+          departamento,
+          fecha,
+          funcion: 'estandar'
+     });
      marcadas = filtrarPersonalActivo(marcadas);
      const Destino = 'ARSENAL NAVAL PUERTO BELGRANO';
      const templatePath = '/parte-template.xlsx';
 
      // Fetch departamento info
-     const departamentos = await fetchDepartamentos();
-     const depto = departamentos.find(d => d.DeptName === departamento);
+     const departamentos = await trpcClient.departamentos.getAll.query();
+     const depto = departamentos.find((d: any) => d.DeptName === departamento);
      const selloJefeBase64 = depto?.SelloJefe || null;
      const leyendaJefe = depto?.leyendaJefe || '';
 

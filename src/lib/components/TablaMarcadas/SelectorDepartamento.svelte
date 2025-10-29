@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Departamento, shortUsuario } from '$lib/types/gen';
-	import { globalStore, setDepartamentos, setSelectedDepartamento } from '$lib/stores/global';
+	import { globalStore, setSelectedDepartamento } from '$lib/stores/global';
 	import { usuarioStore } from '$lib/stores/usuario';
 	import { onDestroy } from 'svelte';
 

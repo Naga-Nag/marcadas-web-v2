@@ -257,7 +257,7 @@ export async function loginWebUser(username: string, password: string): Promise<
                               }
 
                               if (!Bun.env.JWT_SECRET) {
-                                   throw new Error("JWT_SECRET no definido");
+                                   return reject({ error: "JWT_SECRET no definido" });
                               }
 
                               const token = jwt.sign({ username }, Bun.env.JWT_SECRET, { expiresIn: "1h" });

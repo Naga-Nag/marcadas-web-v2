@@ -1,21 +1,28 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { fetchDepartamentos, updateDepartamento } from '$lib/apiController/departamentosApi';
+    import { trpc } from '$lib/trpc/client';
     import type { Departamento } from '$lib/types/gen';
     import { fade, slide } from 'svelte/transition';
 	import { browser } from '$app/environment';
 	import { portal } from '$lib/portals';
 
-    let departamentos: Departamento[] = [];
-    let showEditForm = false;
-    let error = '';
-    let loading = false;
-    let form: Partial<Departamento> = {};
-    let editingDeptid: number | null = null;
-    let selloPreview: string | null = null;
+    let departamentos: Departamento[] = $state([]);
+    let showEditForm = $state(false);
+    let error = $state('');
+    let loading = $state(false);
+    let form: Partial<Departamento> = $state({});
+    let editingDeptid: number | null = $state(null);
+    let selloPreview: string | null = $state(null);
 
     async function loadDepartamentos() {
-        departamentos = await fetchDepartamentos();
+        if (!browser) return;
+        try {
+            const result = await trpc.departamentos.getAll.query();
+            departamentos = result;
+        } catch (e: any) {
+            console.error('Error fetching departamentos:', e);
+            error = e.message || 'Error al cargar departamentos';
+        }
     }
 
     onMount(async () => {
@@ -26,7 +33,6 @@
 				body.style.overflowY = 'auto'; // Enable body scroll
 			}
 		}
-
     });
 
     function openEditForm(event: Event, departamento: Departamento) {
@@ -62,6 +68,8 @@
 
     async function handleSubmit(event: Event) {
         event.preventDefault();
+        if (!browser) return;
+        
         loading = true;
         error = '';
         try {
@@ -70,10 +78,11 @@
                 loading = false;
                 return;
             }
-            await updateDepartamento(form as Departamento);
+            await trpc.departamentos.update.mutate(form as Departamento);
             await loadDepartamentos();
             closeForm();
         } catch (e: any) {
+            console.error('Error updating departamento:', e);
             error = e.message || 'Error al actualizar departamento';
         }
         loading = false;
