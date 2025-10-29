@@ -1,14 +1,15 @@
-<script>
-	import { trpc } from '$lib/trpc/client';
+<script lang=ts>
 	import { browser } from '$app/environment';
 
 	let username = $state('');
 	let password = $state('');
 	let isLoading = $state(false);
 
-	async function handleLogin() {
+	async function handleLogin(e: Event) {
 		if (!browser) return;
-		
+
+		e.preventDefault();
+
 		console.log('LOGIN :: handleLogin: Starting login process for user', username);
 		isLoading = true;
 		
@@ -44,7 +45,7 @@
 <div class="main">
 	<div class="login-container">
 		<h1>Iniciar Sesión</h1>
-		<form on:submit|preventDefault={handleLogin}>
+		<form onsubmit={handleLogin}>
 			<div class="form-group">
 				<label for="username">Usuario:</label>
 				<input type="text" id="username" bind:value={username} required autocomplete="username" />
